@@ -1,0 +1,19 @@
+# .NET build artifacts
+bin/
+obj/
+*.nupkg
+packages/
+
+# IDE
+.vs/
+*.suo
+*.user
+*.sln.docstates
+
+# Test results
+TestResults/
+coverage/
+
+# OS files
+.DS_Store
+Thumbs.db
