@@ -103,7 +103,7 @@ namespace BPlusLib.Foundation.SystemInfo
         {
             try
             {
-                using var key = Registry.LocalMachine.OpenSubKey(BiosRegistryPath);
+                using var key = Microsoft.Win32.Registry.LocalMachine.OpenSubKey(BiosRegistryPath);
                 if (key == null) return;
 
                 _manufacturer = key.GetValue("BaseBoardManufacturer") as string;
@@ -140,7 +140,7 @@ namespace BPlusLib.Foundation.SystemInfo
             try
             {
                 // Method 1: Check SecureBoot\State
-                using var secureBootKey = Registry.LocalMachine.OpenSubKey(SecureBootRegistryPath);
+                using var secureBootKey = Microsoft.Win32.Registry.LocalMachine.OpenSubKey(SecureBootRegistryPath);
                 if (secureBootKey != null)
                 {
                     object? uefiEnabled = secureBootKey.GetValue("UEFISecureBootEnabled");
@@ -160,7 +160,7 @@ namespace BPlusLib.Foundation.SystemInfo
                 }
 
                 // Method 2: Check PEFirmwareType
-                using var peKey = Registry.LocalMachine.OpenSubKey(PEFirmwareTypeRegistryPath);
+                using var peKey = Microsoft.Win32.Registry.LocalMachine.OpenSubKey(PEFirmwareTypeRegistryPath);
                 if (peKey != null)
                 {
                     object? firmwareType = peKey.GetValue(null); // (Default) value

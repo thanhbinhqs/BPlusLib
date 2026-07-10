@@ -277,7 +277,7 @@ namespace BPlusLib.Foundation.SystemInfo
         {
             try
             {
-                using var key = Registry.LocalMachine.OpenSubKey(RegistryKeyWindowsNt);
+                using var key = Microsoft.Win32.Registry.LocalMachine.OpenSubKey(RegistryKeyWindowsNt);
                 if (key == null) return;
 
                 string? productName = key.GetValue("ProductName") as string;

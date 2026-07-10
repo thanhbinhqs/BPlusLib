@@ -197,11 +197,11 @@ namespace BPlusLib.Foundation.SystemInfo
             try
             {
                 // Try the standard battery class device path first
-                using var key = Registry.LocalMachine.OpenSubKey(BatteryRegistryPath);
+                using var key = Microsoft.Win32.Registry.LocalMachine.OpenSubKey(BatteryRegistryPath);
                 if (key == null)
                 {
                     // Try to enumerate battery subkeys under the class GUID
-                    using var classKey = Registry.LocalMachine.OpenSubKey(
+                    using var classKey = Microsoft.Win32.Registry.LocalMachine.OpenSubKey(
                         $@"SYSTEM\CurrentControlSet\Control\Class\{BatteryClassGuid}");
                     if (classKey != null)
                     {

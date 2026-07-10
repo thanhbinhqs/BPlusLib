@@ -231,7 +231,7 @@ namespace BPlusLib.Foundation.SystemInfo
         {
             try
             {
-                using var key = Registry.LocalMachine.OpenSubKey(RegistryCpuKey);
+                using var key = Microsoft.Win32.Registry.LocalMachine.OpenSubKey(RegistryCpuKey);
                 if (key == null) return;
 
                 string? processorName = key.GetValue("ProcessorNameString") as string;
@@ -372,7 +372,7 @@ namespace BPlusLib.Foundation.SystemInfo
                 }
 
                 // Check BIOS version in registry
-                using var biosKey = Registry.LocalMachine.OpenSubKey(
+                using var biosKey = Microsoft.Win32.Registry.LocalMachine.OpenSubKey(
                     @"HARDWARE\DESCRIPTION\System\SystemBiosVersion");
                 if (biosKey != null)
                 {
@@ -394,7 +394,7 @@ namespace BPlusLib.Foundation.SystemInfo
                 }
 
                 // Check for Hyper-V presence
-                using var hyperVKey = Registry.LocalMachine.OpenSubKey(
+                using var hyperVKey = Microsoft.Win32.Registry.LocalMachine.OpenSubKey(
                     @"SOFTWARE\Microsoft\Windows NT\CurrentVersion\Virtualization");
                 if (hyperVKey != null)
                 {
