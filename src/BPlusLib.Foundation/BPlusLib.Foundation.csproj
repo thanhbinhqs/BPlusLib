@@ -1,0 +1,37 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>net472;net6.0;net8.0</TargetFrameworks>
+    <LangVersion>12</LangVersion>
+    <Nullable>enable</Nullable>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <AssemblyName>BPlusLib.Foundation</AssemblyName>
+    <RootNamespace>BPlusLib.Foundation</RootNamespace>
+    <Description>BPlusLib.Foundation — Enterprise-grade Windows Foundation Library: serial port inspection, dialogs, window management, system info, and utilities.</Description>
+    <Version>2.0.0</Version>
+    <Authors>thanhbinhqs</Authors>
+    <Company>thanhbinhqs</Company>
+    <PackageId>BPlusLib.Foundation</PackageId>
+    <PackageProjectUrl>https://github.com/thanhbinhqs/BPlusLib</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/thanhbinhqs/BPlusLib.git</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageTags>windows;foundation;serialport;messagebox;win32;pinvoke;dpi;monitor</PackageTags>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <Deterministic>true</Deterministic>
+    <Features>strict</Features>
+    <NoWarn>$(NoWarn);CS1591</NoWarn>
+  </PropertyGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)' == 'net472' or '$(TargetFramework)' == 'net6.0'">
+    <PackageReference Include="Microsoft.Bcl.HashCode" Version="1.1.1" />
+    <PackageReference Include="System.Threading.Tasks.Extensions" Version="4.5.4" />
+    <PackageReference Include="System.Memory" Version="4.5.5" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\..\README.md" Pack="true" PackagePath="\" />
+    <None Include="..\..\LICENSE" Pack="true" PackagePath="\" />
+  </ItemGroup>
+
+</Project>
