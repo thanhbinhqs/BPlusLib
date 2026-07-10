@@ -55,7 +55,7 @@ namespace BPlusLib.Foundation.SerialPorts
 
         private static string? GetProcessNameFromId(int processId)
         {
-            try { var proc = Process.GetProcessById(processId); return proc.ProcessName + ".exe"; }
+            try { var proc = System.Diagnostics.Process.GetProcessById(processId); return proc.ProcessName + ".exe"; }
             catch { return null; }
         }
 

@@ -232,7 +232,7 @@ namespace BPlusLib.Foundation
 
             try
             {
-                using var process = new Process
+                using var process = new System.Diagnostics.Process
                 {
                     StartInfo = new ProcessStartInfo
                     {

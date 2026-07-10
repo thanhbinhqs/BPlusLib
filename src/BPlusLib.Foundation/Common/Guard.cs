@@ -47,7 +47,9 @@ namespace BPlusLib.Foundation.Common
         {
             if (string.IsNullOrEmpty(argument))
                 ThrowArgumentException("Value cannot be null or empty.", paramName);
+#pragma warning disable CS8777 // Parameter must have non-null value when exiting — guaranteed by throw above
         }
+#pragma warning restore CS8777
 
         /// <summary>
         /// Throws <see cref="ArgumentException"/> if <paramref name="argument"/> is null, empty, or whitespace.
@@ -58,7 +60,9 @@ namespace BPlusLib.Foundation.Common
         {
             if (string.IsNullOrWhiteSpace(argument))
                 ThrowArgumentException("Value cannot be null, empty, or consist only of whitespace.", paramName);
+#pragma warning disable CS8777 // Parameter must have non-null value when exiting — guaranteed by throw above
         }
+#pragma warning restore CS8777
 
         /// <summary>
         /// Throws <see cref="ArgumentOutOfRangeException"/> if <paramref name="value"/> is outside [<paramref name="min"/>, <paramref name="max"/>].

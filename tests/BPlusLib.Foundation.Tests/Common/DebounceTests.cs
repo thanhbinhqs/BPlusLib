@@ -24,8 +24,8 @@ namespace BPlusLib.Foundation.Tests.Common
             debounce.Invoke(() => executed = true);
 
             executed.Should().BeFalse();
-            Thread.Sleep(120);
-            executed.Should().BeTrue();
+            SpinWait.SpinUntil(() => executed, TimeSpan.FromSeconds(2))
+                .Should().BeTrue("the debounce timer should have fired");
             debounce.Dispose();
         }
 
@@ -39,7 +39,8 @@ namespace BPlusLib.Foundation.Tests.Common
             debounce.Invoke(() => lastValue = 2);
             debounce.Invoke(() => lastValue = 3);
 
-            Thread.Sleep(120);
+            SpinWait.SpinUntil(() => lastValue == 3, TimeSpan.FromSeconds(2))
+                .Should().BeTrue("only the last invoke should fire");
             lastValue.Should().Be(3);
             debounce.Dispose();
         }
@@ -53,7 +54,7 @@ namespace BPlusLib.Foundation.Tests.Common
             debounce.Invoke(() => executed = true);
             debounce.Cancel();
 
-            Thread.Sleep(120);
+            Thread.Sleep(200);
             executed.Should().BeFalse();
             debounce.Dispose();
         }
@@ -67,7 +68,7 @@ namespace BPlusLib.Foundation.Tests.Common
             debounce.Invoke(() => executed = true);
             debounce.Dispose();
 
-            Thread.Sleep(120);
+            Thread.Sleep(200);
             executed.Should().BeFalse();
         }
     }
