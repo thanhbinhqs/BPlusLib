@@ -1,168 +1,154 @@
-// <copyright file="NativeMethods.cs" company="BPlusLib">
+// <copyright file="SafeNativeMethods.cs" company="BPlusLib">
 // Copyright (c) BPlusLib. All rights reserved.
 // Licensed under the MIT license.
 // </copyright>
 
 using System;
+using System.ComponentModel;
 using System.Runtime.InteropServices;
 using System.Text;
+using BPlusLib.Foundation.Common;
+using BPlusLib.Foundation.Native;
+using BPlusLib.Foundation.Native.SafeHandles;
 
 namespace BPlusLib.Foundation
 {
     /// <summary>
-    /// Central P/Invoke declarations for all BPlusLib components.
-    /// Grouped by subsystem: NT API, kernel32, user32, etc.
+    /// Safe wrappers around Win32 P/Invoke calls that return <see cref="Result{T}"/>
+    /// instead of throwing raw exceptions or requiring manual error checking.
     /// </summary>
-    internal static class NativeMethods
+    internal static class SafeNativeMethods
     {
-        // =====================================================================
-        // NT API constants
-        // =====================================================================
-        internal const int SystemExtendedHandleInformation = 64;
-        internal const int ObjectNameInformation = 1;
-        internal const int ObjectTypeInformation = 2;
-        internal const int ProcessBasicInformation = 0;
-        internal const int ProcessCommandLineInformation = 63;
-        internal const int ProcessDuplicateHandle = 0x0040;
-        internal const uint ProcessQueryInformation = 0x0400 | 0x1000;
-        internal const uint DuplicateSameAccess = 0x00000002;
-        internal const int StatusInfoLengthMismatch = unchecked((int)0xC0000004);
-        internal const int StatusSuccess = 0;
-        internal const int StatusBufferTooSmall = unchecked((int)0xC0000023);
-        internal const int StatusBufferOverflow = unchecked((int)0x80000005);
-        internal const int InitialHandleBufferSize = 256 * 1024;
-        internal const int MaxHandleBufferSize = 16 * 1024 * 1024;
-        internal const int MaxObjectNameChars = 1024;
-        internal const int MaxCommandLineChars = 32768;
-        internal const int MaxPathChars = 260;
-        internal const int ExtendedMaxPathChars = 32767;
-        internal const uint ProcessNameWin32 = 0;
-        internal const uint ProcessNameNative = 1;
-        internal static readonly IntPtr InvalidHandleValue = new IntPtr(-1);
+        /// <summary>
+        /// Safely retrieves the bounding rectangle of the specified window.
+        /// </summary>
+        /// <param name="hwnd">Handle to the window.</param>
+        /// <returns>A <see cref="Result{RECT}"/> containing the rectangle on success,
+        /// or a failure with <see cref="Win32Exception"/> on error.</returns>
+        internal static Result<RECT> GetWindowRectSafe(IntPtr hwnd)
+        {
+            if (!User32.GetWindowRect(hwnd, out RECT rect))
+            {
+                int error = Marshal.GetLastWin32Error();
+                return Result<RECT>.Fail(new Win32Exception(error));
+            }
 
-        internal static bool NtSuccess(int status) => status >= 0;
+            return Result<RECT>.Ok(rect);
+        }
 
-        // =====================================================================
-        // ntdll.dll
-        // =====================================================================
-        [DllImport("ntdll.dll", ExactSpelling = true, SetLastError = false)]
-        internal static extern int NtQuerySystemInformation(
-            int informationClass, IntPtr buffer, int bufferSize, out int returnedLength);
+        /// <summary>
+        /// Safely retrieves information about a display monitor.
+        /// </summary>
+        /// <param name="hmonitor">Handle to the display monitor.</param>
+        /// <returns>A <see cref="Result{MONITORINFO}"/> containing monitor information on success,
+        /// or a failure with <see cref="Win32Exception"/> on error.</returns>
+        internal static Result<MONITORINFO> GetMonitorInfoSafe(IntPtr hmonitor)
+        {
+            var mi = default(MONITORINFO);
+            mi.Init();
 
-        [DllImport("ntdll.dll", ExactSpelling = true, SetLastError = false)]
-        internal static extern int NtQueryObject(
-            IntPtr handle, int objectInformationClass, IntPtr objectInformation,
-            int objectInformationLength, out int returnLength);
+            if (!User32.GetMonitorInfoW(hmonitor, ref mi))
+            {
+                int error = Marshal.GetLastWin32Error();
+                return Result<MONITORINFO>.Fail(new Win32Exception(error));
+            }
 
-        [DllImport("ntdll.dll", ExactSpelling = true, SetLastError = false)]
-        internal static extern int NtQueryInformationProcess(
-            IntPtr processHandle, int processInformationClass, IntPtr processInformation,
-            int processInformationLength, out int returnLength);
+            return Result<MONITORINFO>.Ok(mi);
+        }
 
-        // =====================================================================
-        // kernel32.dll
-        // =====================================================================
-        [DllImport("kernel32.dll", SetLastError = true)]
-        internal static extern IntPtr OpenProcess(uint desiredAccess, [MarshalAs(UnmanagedType.Bool)] bool inheritHandle, int processId);
+        /// <summary>
+        /// Safely gets the DPI value for a window (Windows 10+).
+        /// </summary>
+        /// <param name="hwnd">Handle to the window.</param>
+        /// <returns>A <see cref="Result{Int32}"/> containing the DPI value on success,
+        /// or a failure with <see cref="Win32Exception"/> on error (zero return).</returns>
+        /// <remarks>Returns 0 on platforms earlier than Windows 10.</remarks>
+        internal static Result<int> GetDpiForWindowSafe(IntPtr hwnd)
+        {
+            int dpi = User32.GetDpiForWindow(hwnd);
+            if (dpi == 0)
+            {
+                int error = Marshal.GetLastWin32Error();
+                return Result<int>.Fail(new Win32Exception(error));
+            }
 
-        [DllImport("kernel32.dll", SetLastError = true)]
-        [return: MarshalAs(UnmanagedType.Bool)]
-        internal static extern bool DuplicateHandle(
-            IntPtr sourceProcessHandle, IntPtr sourceHandle, IntPtr targetProcessHandle,
-            out IntPtr targetHandle, uint desiredAccess,
-            [MarshalAs(UnmanagedType.Bool)] bool inheritHandle, uint options);
+            return Result<int>.Ok(dpi);
+        }
 
-        [DllImport("kernel32.dll", SetLastError = true)]
-        [return: MarshalAs(UnmanagedType.Bool)]
-        internal static extern bool CloseHandle(IntPtr hObject);
+        /// <summary>
+        /// Safely retrieves the text of the specified window's title bar.
+        /// </summary>
+        /// <param name="hwnd">Handle to the window.</param>
+        /// <returns>A <see cref="Result{String}"/> containing the window text on success,
+        /// or a failure with <see cref="Win32Exception"/> on error.</returns>
+        internal static Result<string> GetWindowTextSafe(IntPtr hwnd)
+        {
+            int length = User32.GetWindowTextLengthW(hwnd);
+            if (length == 0)
+            {
+                int error = Marshal.GetLastWin32Error();
+                // Zero-length text is valid (empty title bar), but GetWindowTextLengthW
+                // returns 0 both for empty strings and errors. Check last error.
+                if (error != 0)
+                    return Result<string>.Fail(new Win32Exception(error));
+                return Result<string>.Ok(string.Empty);
+            }
 
-        [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
-        [return: MarshalAs(UnmanagedType.Bool)]
-        internal static extern bool QueryFullProcessImageName(
-            IntPtr handle, uint dwFlags, StringBuilder lpExeName, ref uint lpdwSize);
+            var sb = new StringBuilder(length + 1);
+            int charsCopied = User32.GetWindowTextW(hwnd, sb, sb.Capacity);
+            if (charsCopied == 0)
+            {
+                int error = Marshal.GetLastWin32Error();
+                return Result<string>.Fail(new Win32Exception(error));
+            }
 
-        [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
-        internal static extern uint QueryDosDevice(
-            string? lpDeviceName, StringBuilder lpTargetDevice, uint bufferLength);
+            return Result<string>.Ok(sb.ToString(0, charsCopied));
+        }
 
-        [DllImport("kernel32.dll", SetLastError = true)]
-        [return: MarshalAs(UnmanagedType.Bool)]
-        internal static extern bool GetProcessTimes(
-            IntPtr handle, out long lpCreationTime, out long lpExitTime,
-            out long lpKernelTime, out long lpUserTime);
+        /// <summary>
+        /// Safely opens an existing process and wraps the handle in a <see cref="SafeProcessHandle"/>.
+        /// </summary>
+        /// <param name="access">The desired access mask.</param>
+        /// <param name="processId">The process ID to open.</param>
+        /// <returns>A <see cref="Result{SafeProcessHandle}"/> containing a safe process handle on success,
+        /// or a failure with <see cref="Win32Exception"/> on error.</returns>
+        internal static Result<SafeProcessHandle> OpenProcessSafe(uint access, int processId)
+        {
+            IntPtr rawHandle = Kernel32.OpenProcess(access, false, processId);
+            if (rawHandle == IntPtr.Zero)
+            {
+                int error = Marshal.GetLastWin32Error();
+                return Result<SafeProcessHandle>.Fail(new Win32Exception(error));
+            }
 
-        [DllImport("kernel32.dll", ExactSpelling = true)]
-        internal static extern IntPtr GetCurrentProcess();
+            return Result<SafeProcessHandle>.Ok(new SafeProcessHandle(rawHandle, true));
+        }
 
-        [DllImport("kernel32.dll", ExactSpelling = true)]
-        internal static extern int GetCurrentProcessId();
+        /// <summary>
+        /// Safely duplicates a handle from a source process into the current process.
+        /// </summary>
+        /// <param name="sourceProcess">Safe handle to the source process.</param>
+        /// <param name="sourceHandle">The handle value to duplicate.</param>
+        /// <returns>A <see cref="Result{T}"/> of <see cref="IntPtr"/> containing the duplicated handle on success,
+        /// or a failure with <see cref="Win32Exception"/> on error.</returns>
+        internal static Result<IntPtr> DuplicateHandleSafe(SafeProcessHandle sourceProcess, IntPtr sourceHandle)
+        {
+            IntPtr currentProcess = Kernel32.GetCurrentProcess();
 
-        [DllImport("kernel32.dll", ExactSpelling = true)]
-        internal static extern int GetLastError();
+            if (!Kernel32.DuplicateHandle(
+                    sourceProcess.DangerousGetHandle(),
+                    sourceHandle,
+                    currentProcess,
+                    out IntPtr duplicatedHandle,
+                    0,
+                    false,
+                    Kernel32.DuplicateSameAccess))
+            {
+                int error = Marshal.GetLastWin32Error();
+                return Result<IntPtr>.Fail(new Win32Exception(error));
+            }
 
-        [DllImport("kernel32.dll", ExactSpelling = true)]
-        internal static extern int GetCurrentThreadId();
-
-        [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
-        internal static extern int FormatMessageW(
-            uint dwFlags, IntPtr lpSource, int dwMessageId, uint dwLanguageId,
-            StringBuilder lpBuffer, int nSize, IntPtr arguments);
-
-        internal const uint FormatMessageFromSystem = 0x00001000;
-        internal const uint FormatMessageIgnoreInserts = 0x00000200;
-        internal const int FormatMessageBufferSize = 512;
-
-        // =====================================================================
-        // user32.dll  (for MessageBoxEx)
-        // =====================================================================
-        internal const uint SWP_NOSIZE = 0x0001;
-        internal const uint SWP_NOZORDER = 0x0004;
-        internal const uint SWP_NOACTIVATE = 0x0010;
-        internal const int HWND_TOPMOST = -1;
-
-        internal const int WH_CBT = 5;
-        internal const int HCBT_ACTIVATE = 5;
-        internal const int HCBT_CREATEWND = 3;
-
-        internal delegate IntPtr HookProc(int nCode, IntPtr wParam, IntPtr lParam);
-
-        [DllImport("user32.dll", SetLastError = true)]
-        internal static extern IntPtr SetWindowsHookEx(int idHook, HookProc lpfn, IntPtr hmod, uint dwThreadId);
-
-        [DllImport("user32.dll", SetLastError = true)]
-        [return: MarshalAs(UnmanagedType.Bool)]
-        internal static extern bool UnhookWindowsHookEx(IntPtr hhk);
-
-        [DllImport("user32.dll", SetLastError = true)]
-        internal static extern IntPtr CallNextHookEx(IntPtr hhk, int nCode, IntPtr wParam, IntPtr lParam);
-
-        [DllImport("user32.dll", SetLastError = true)]
-        [return: MarshalAs(UnmanagedType.Bool)]
-        internal static extern bool GetWindowRect(IntPtr hWnd, out RECT lpRect);
-
-        [DllImport("user32.dll", SetLastError = true)]
-        internal static extern IntPtr GetParent(IntPtr hWnd);
-
-        [DllImport("user32.dll", SetLastError = true)]
-        [return: MarshalAs(UnmanagedType.Bool)]
-        internal static extern bool SetWindowPos(IntPtr hWnd, IntPtr hWndInsertAfter, int X, int Y, int cx, int cy, uint uFlags);
-
-        [DllImport("user32.dll", SetLastError = true)]
-        internal static extern int GetSystemMetrics(int nIndex);
-
-        internal const int SM_CXSCREEN = 0;
-        internal const int SM_CYSCREEN = 1;
-
-        [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
-        internal static extern int MessageBox(IntPtr hWnd, string text, string caption, uint type);
-
-        [DllImport("user32.dll", SetLastError = true)]
-        internal static extern uint GetWindowThreadProcessId(IntPtr hWnd, out int lpdwProcessId);
-
-        // =====================================================================
-        // Shell32 / misc
-        // =====================================================================
-        [DllImport("shell32.dll", SetLastError = true)]
-        internal static extern IntPtr CommandLineToArgvW([MarshalAs(UnmanagedType.LPWStr)] string lpCmdLine, out int pNumArgs);
+            return Result<IntPtr>.Ok(duplicatedHandle);
+        }
     }
 }

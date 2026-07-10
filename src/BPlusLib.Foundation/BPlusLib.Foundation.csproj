@@ -34,4 +34,10 @@
     <None Include="..\..\LICENSE" Pack="true" PackagePath="\" />
   </ItemGroup>
 
+  <!-- Windows-only: WinForms support for the Window module -->
+  <PropertyGroup Condition="$([MSBuild]::IsOSPlatform('Windows'))">
+    <UseWindowsForms>true</UseWindowsForms>
+    <DefineConstants>$(DefineConstants);FEATURE_WINDOW_MODULE</DefineConstants>
+  </PropertyGroup>
+
 </Project>
