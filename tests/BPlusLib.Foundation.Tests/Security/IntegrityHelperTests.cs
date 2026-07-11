@@ -37,6 +37,7 @@ namespace BPlusLib.Foundation.Tests.Security
                 IntegrityLevel.Medium,
                 IntegrityLevel.High,
                 IntegrityLevel.System,
+                IntegrityLevel.MediumPlus,
                 IntegrityLevel.ProtectedProcess);
         }
 

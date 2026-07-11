@@ -22,6 +22,9 @@ namespace BPlusLib.Foundation.Security
         /// <summary>Medium integrity level (SID S-1-16-8192 = 0x2000).</summary>
         Medium = 0x2000,
 
+        /// <summary>Medium-Plus integrity level (SID S-1-16-8448 = 0x2100).</summary>
+        MediumPlus = 8448,
+
         /// <summary>High integrity level (SID S-1-16-12288 = 0x3000). Typically for elevated processes.</summary>
         High = 0x3000,
 
