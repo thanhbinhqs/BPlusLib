@@ -462,5 +462,161 @@ namespace BPlusLib.Foundation.Native
 
         /// <summary>SPI_GETWORKAREA — Retrieves the size of the work area on the primary display monitor.</summary>
         internal const uint SPI_GETWORKAREA = 0x0030;
+
+        // =================================================================
+        // Hotkey API
+        // =================================================================
+
+        [DllImport("user32.dll", SetLastError = true)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        internal static extern bool RegisterHotKey(
+            IntPtr hWnd,
+            int id,
+            uint fsModifiers,
+            uint vk);
+
+        [DllImport("user32.dll", SetLastError = true)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        internal static extern bool UnregisterHotKey(
+            IntPtr hWnd,
+            int id);
+
+        // Modifier flags
+        internal const uint MOD_ALT = 0x0001;
+        internal const uint MOD_CONTROL = 0x0002;
+        internal const uint MOD_SHIFT = 0x0004;
+        internal const uint MOD_WIN = 0x0008;
+        internal const uint MOD_NOREPEAT = 0x4000;
+
+        // =================================================================
+        // SendInput API
+        // =================================================================
+
+        [DllImport("user32.dll", SetLastError = true)]
+        internal static extern uint SendInput(
+            uint cInputs,
+            [MarshalAs(UnmanagedType.LPArray)] INPUT[] pInputs,
+            int cbSize);
+
+        internal const int INPUT_MOUSE = 0;
+        internal const int INPUT_KEYBOARD = 1;
+        internal const int INPUT_HARDWARE = 2;
+
+        internal const uint KEYEVENTF_KEYDOWN = 0x0000;
+        internal const uint KEYEVENTF_EXTENDEDKEY = 0x0001;
+        internal const uint KEYEVENTF_KEYUP = 0x0002;
+        internal const uint KEYEVENTF_SCANCODE = 0x0008;
+        internal const uint KEYEVENTF_UNICODE = 0x0004;
+
+        internal const uint MOUSEEVENTF_MOVE = 0x0001;
+        internal const uint MOUSEEVENTF_LEFTDOWN = 0x0002;
+        internal const uint MOUSEEVENTF_LEFTUP = 0x0004;
+        internal const uint MOUSEEVENTF_RIGHTDOWN = 0x0008;
+        internal const uint MOUSEEVENTF_RIGHTUP = 0x0010;
+        internal const uint MOUSEEVENTF_MIDDLEDOWN = 0x0020;
+        internal const uint MOUSEEVENTF_MIDDLEUP = 0x0040;
+        internal const uint MOUSEEVENTF_XDOWN = 0x0080;
+        internal const uint MOUSEEVENTF_XUP = 0x0100;
+        internal const uint MOUSEEVENTF_WHEEL = 0x0800;
+        internal const uint MOUSEEVENTF_HWHEEL = 0x1000;
+        internal const uint MOUSEEVENTF_ABSOLUTE = 0x8000;
+    }
+
+    /// <summary>Virtual key codes — common subset used by InputHelper.</summary>
+    public enum VirtualKeyCode : ushort
+    {
+        Backspace = 0x08,
+        Tab = 0x09,
+        Clear = 0x0C,
+        Enter = 0x0D,
+        Shift = 0x10,
+        Control = 0x11,
+        Alt = 0x12,
+        Pause = 0x13,
+        CapsLock = 0x14,
+        Escape = 0x1B,
+        Space = 0x20,
+        PageUp = 0x21,
+        PageDown = 0x22,
+        End = 0x23,
+        Home = 0x24,
+        Left = 0x25,
+        Up = 0x26,
+        Right = 0x27,
+        Down = 0x28,
+        Delete = 0x2E,
+        A = 0x41, B, C, D, E, F, G, H, I, J, K, L, M,
+        N = 0x4E, O, P, Q, R, S, T, U, V, W, X, Y, Z,
+        LWin = 0x5B,
+        RWin = 0x5C,
+        NumPad0 = 0x60, NumPad1, NumPad2, NumPad3, NumPad4,
+        NumPad5 = 0x65, NumPad6, NumPad7, NumPad8, NumPad9,
+        Multiply = 0x6A,
+        Add = 0x6B,
+        Subtract = 0x6D,
+        Decimal = 0x6E,
+        Divide = 0x6F,
+        F1 = 0x70, F2, F3, F4, F5, F6, F7, F8, F9, F10,
+        F11 = 0x7A, F12 = 0x7B,
+        NumLock = 0x90,
+        ScrollLock = 0x91,
+        LShift = 0xA0,
+        RShift = 0xA1,
+        LControl = 0xA2,
+        RControl = 0xA3,
+        LAlt = 0xA4,
+        RAlt = 0xA5,
+    }
+
+    /// <summary>INPUT structure for SendInput.</summary>
+    [StructLayout(LayoutKind.Sequential)]
+    internal struct INPUT
+    {
+        public int type;
+        public INPUT_UNION union;
+    }
+
+    /// <summary>Union of mouse/keyboard/hardware input.</summary>
+    [StructLayout(LayoutKind.Explicit)]
+    internal struct INPUT_UNION
+    {
+        [FieldOffset(0)]
+        public MOUSEINPUT mi;
+        [FieldOffset(0)]
+        public KEYBDINPUT ki;
+        [FieldOffset(0)]
+        public HARDWAREINPUT hi;
+    }
+
+    /// <summary>Mouse input data.</summary>
+    [StructLayout(LayoutKind.Sequential)]
+    internal struct MOUSEINPUT
+    {
+        public int dx;
+        public int dy;
+        public uint mouseData;
+        public uint dwFlags;
+        public uint time;
+        public IntPtr dwExtraInfo;
+    }
+
+    /// <summary>Keyboard input data.</summary>
+    [StructLayout(LayoutKind.Sequential)]
+    internal struct KEYBDINPUT
+    {
+        public ushort wVk;
+        public ushort wScan;
+        public uint dwFlags;
+        public uint time;
+        public IntPtr dwExtraInfo;
+    }
+
+    /// <summary>Hardware input data.</summary>
+    [StructLayout(LayoutKind.Sequential)]
+    internal struct HARDWAREINPUT
+    {
+        public uint uMsg;
+        public ushort wParamL;
+        public ushort wParamH;
     }
 }
