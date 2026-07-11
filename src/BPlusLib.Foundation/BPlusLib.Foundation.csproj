@@ -9,7 +9,7 @@
     <AssemblyName>BPlusLib.Foundation</AssemblyName>
     <RootNamespace>BPlusLib.Foundation</RootNamespace>
     <Description>BPlusLib.Foundation — Enterprise-grade Windows Foundation Library: serial port inspection, dialogs, window management, system info, and utilities.</Description>
-    <Version>2.5.0</Version>
+    <Version>2.6.0</Version>
     <Authors>thanhbinhqs</Authors>
     <Company>thanhbinhqs</Company>
     <PackageId>BPlusLib.Foundation</PackageId>
