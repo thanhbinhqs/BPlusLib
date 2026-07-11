@@ -18,6 +18,9 @@ namespace BPlusLib.Foundation.Native
         // Constants
         // =====================================================================
 
+        /// <summary>PROCESS_CREATE_PROCESS (0x0080) — Required to create a process.</summary>
+        internal const uint ProcessCreateProcess = 0x0080;
+
         /// <summary>PROCESS_DUP_HANDLE (0x0040) — Required to duplicate a handle.</summary>
         internal const uint ProcessDuplicateHandle = 0x0040;
 
@@ -165,8 +168,158 @@ namespace BPlusLib.Foundation.Native
             int nSize,
             IntPtr arguments);
 
+        // =====================================================================
+        // Job Object constants
+        // =====================================================================
+
+        internal const uint JOB_OBJECT_LIMIT_KILL_ON_JOB_CLOSE = 0x2000;
+        internal const uint JOB_OBJECT_LIMIT_PROCESS_TIME = 0x0002;
+        internal const uint JOB_OBJECT_LIMIT_JOB_TIME = 0x0004;
+        internal const uint JOB_OBJECT_LIMIT_ACTIVE_PROCESS = 0x0008;
+        internal const uint JOB_OBJECT_LIMIT_AFFINITY = 0x0010;
+        internal const uint JOB_OBJECT_LIMIT_PRIORITY_CLASS = 0x0020;
+        internal const uint JOB_OBJECT_LIMIT_WORKING_SET = 0x0001;
+        internal const uint JOB_OBJECT_LIMIT_DIE_ON_UNHANDLED_EXCEPTION = 0x0400;
+        internal const uint JOB_OBJECT_LIMIT_JOB_MEMORY = 0x0200;
+        internal const uint JOB_OBJECT_QUERY = 0x0004;
+        internal const uint JOB_OBJECT_SET_ATTRIBUTES = 0x0002;
+        internal const uint JOB_OBJECT_TERMINATE = 0x0008;
+
+        // =====================================================================
+        // Job Object structures
+        // =====================================================================
+
+        [StructLayout(LayoutKind.Sequential)]
+        internal struct JOBOBJECT_BASIC_LIMIT_INFORMATION
+        {
+            public long PerProcessUserTimeLimit;
+            public long PerJobUserTimeLimit;
+            public uint LimitFlags;
+            public IntPtr MinimumWorkingSetSize;
+            public IntPtr MaximumWorkingSetSize;
+            public uint ActiveProcessLimit;
+            public IntPtr Affinity;
+            public uint PriorityClass;
+            public uint SchedulingClass;
+        }
+
+        [StructLayout(LayoutKind.Sequential)]
+        internal struct JOBOBJECT_EXTENDED_LIMIT_INFORMATION
+        {
+            public JOBOBJECT_BASIC_LIMIT_INFORMATION BasicLimitInformation;
+            public IO_COUNTERS IoInfo;
+            public IntPtr ProcessMemoryLimit;
+            public IntPtr JobMemoryLimit;
+            public IntPtr PeakProcessMemoryUsed;
+            public IntPtr PeakJobMemoryUsed;
+        }
+
+        [StructLayout(LayoutKind.Sequential)]
+        internal struct IO_COUNTERS
+        {
+            public ulong ReadOperationCount;
+            public ulong WriteOperationCount;
+            public ulong OtherOperationCount;
+            public ulong ReadTransferCount;
+            public ulong WriteTransferCount;
+            public ulong OtherTransferCount;
+        }
+
+        // =====================================================================
+        // Job Object P/Invoke
+        // =====================================================================
+
+        [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+        internal static extern IntPtr CreateJobObjectW(
+            IntPtr lpJobAttributes,
+            string? lpName);
+
+        [DllImport("kernel32.dll", SetLastError = true)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        internal static extern bool AssignProcessToJobObject(
+            IntPtr hJob,
+            IntPtr hProcess);
+
+        [DllImport("kernel32.dll", SetLastError = true)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        internal static extern bool SetInformationJobObject(
+            IntPtr hJob,
+            int jobObjectInformationClass,
+            IntPtr lpJobObjectInformation,
+            uint cbJobObjectInformationLength);
+
+        [DllImport("kernel32.dll", SetLastError = true)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        internal static extern bool QueryInformationJobObject(
+            IntPtr hJob,
+            int jobObjectInformationClass,
+            IntPtr lpJobObjectInformation,
+            uint cbJobObjectInformationLength,
+            out uint lpReturnLength);
+
+        [DllImport("kernel32.dll", SetLastError = true)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        internal static extern bool TerminateJobObject(
+            IntPtr hJob,
+            uint exitCode);
+
+        [DllImport("kernel32.dll", SetLastError = true)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        internal static extern bool IsProcessInJob(
+            IntPtr hProcess,
+            IntPtr hJob,
+            [MarshalAs(UnmanagedType.Bool)] out bool result);
+
         /// <summary>Sets the last-error code for the calling thread.</summary>
         [DllImport("kernel32.dll", ExactSpelling = true)]
         internal static extern void SetLastError(int dwErrorCode);
+
+        // =================================================================
+        // Console API
+        // =================================================================
+
+        [DllImport("kernel32.dll", SetLastError = true)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        internal static extern bool AllocConsole();
+
+        [DllImport("kernel32.dll", SetLastError = true)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        internal static extern bool FreeConsole();
+
+        [DllImport("kernel32.dll", SetLastError = true)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        internal static extern bool AttachConsole(int dwProcessId);
+        internal const int ATTACH_PARENT_PROCESS = -1;
+
+        [DllImport("kernel32.dll", ExactSpelling = true)]
+        internal static extern IntPtr GetConsoleWindow();
+
+        [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        internal static extern bool SetConsoleTitleW(string lpConsoleTitle);
+
+        [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+        internal static extern int GetConsoleTitleW(StringBuilder title, int size);
+
+        [DllImport("kernel32.dll", SetLastError = true)]
+        internal static extern IntPtr GetStdHandle(int nStdHandle);
+        internal const int STD_INPUT_HANDLE = -10;
+        internal const int STD_OUTPUT_HANDLE = -11;
+        internal const int STD_ERROR_HANDLE = -12;
+
+        [DllImport("kernel32.dll", SetLastError = true)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        internal static extern bool SetConsoleTextAttribute(
+            IntPtr consoleHandle, ushort attributes);
+
+        [DllImport("kernel32.dll", SetLastError = true)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        internal static extern bool GetConsoleMode(
+            IntPtr consoleHandle, out uint mode);
+
+        [DllImport("kernel32.dll", SetLastError = true)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        internal static extern bool SetConsoleMode(
+            IntPtr consoleHandle, uint mode);
     }
 }

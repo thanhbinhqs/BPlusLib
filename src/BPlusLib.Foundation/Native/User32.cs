@@ -195,6 +195,11 @@ namespace BPlusLib.Foundation.Native
         [return: MarshalAs(UnmanagedType.Bool)]
         internal static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
 
+        /// <summary>Sets the show state of a window asynchronously.</summary>
+        [DllImport("user32.dll", SetLastError = true)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        internal static extern bool ShowWindowAsync(IntPtr hWnd, int nCmdShow);
+
         /// <summary>
         /// Determines the visibility state of the specified window.
         /// </summary>
