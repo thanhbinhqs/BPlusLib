@@ -326,6 +326,32 @@ namespace BPlusLib.Foundation.Native
         internal static readonly IntPtr INVALID_HANDLE_VALUE = new IntPtr(-1);
 
         // =================================================================
+        // System Power Status API
+        // =================================================================
+
+        [StructLayout(LayoutKind.Sequential)]
+        internal struct SYSTEM_POWER_STATUS
+        {
+            public byte ACLineStatus;
+            public byte BatteryFlag;
+            public byte BatteryLifePercent;
+            public byte SystemStatusFlag;  // reserved
+            public int BatteryLifeTime;
+            public int BatteryFullLifeTime;
+        }
+
+        [DllImport("kernel32.dll", SetLastError = true)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        internal static extern bool GetSystemPowerStatus(out SYSTEM_POWER_STATUS lpSystemPowerStatus);
+
+        [DllImport("kernel32.dll", SetLastError = true)]
+        internal static extern uint SetThreadExecutionState(uint esFlags);
+        internal const uint ES_CONTINUOUS = 0x80000000;
+        internal const uint ES_SYSTEM_REQUIRED = 0x00000001;
+        internal const uint ES_DISPLAY_REQUIRED = 0x00000002;
+        internal const uint ES_AWAYMODE_REQUIRED = 0x00000040;
+
+        // =================================================================
         // Named Pipe API
         // =================================================================
 

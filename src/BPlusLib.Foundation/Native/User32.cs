@@ -520,6 +520,24 @@ namespace BPlusLib.Foundation.Native
         internal const uint MOUSEEVENTF_WHEEL = 0x0800;
         internal const uint MOUSEEVENTF_HWHEEL = 0x1000;
         internal const uint MOUSEEVENTF_ABSOLUTE = 0x8000;
+
+        // =================================================================
+        // Shutdown / Logoff / Lock API
+        // =================================================================
+
+        [DllImport("user32.dll", SetLastError = true)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        internal static extern bool ExitWindowsEx(uint uFlags, uint dwReason);
+        internal const uint EWX_LOGOFF = 0;
+        internal const uint EWX_SHUTDOWN = 0x00000001;
+        internal const uint EWX_REBOOT = 0x00000002;
+        internal const uint EWX_FORCE = 0x00000004;
+        internal const uint EWX_POWEROFF = 0x00000008;
+        internal const uint EWX_FORCEIFHUNG = 0x00000010;
+
+        [DllImport("user32.dll", SetLastError = true)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        internal static extern bool LockWorkStation();
     }
 
     /// <summary>Virtual key codes — common subset used by InputHelper.</summary>
