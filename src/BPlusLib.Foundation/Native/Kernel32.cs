@@ -321,5 +321,221 @@ namespace BPlusLib.Foundation.Native
         [return: MarshalAs(UnmanagedType.Bool)]
         internal static extern bool SetConsoleMode(
             IntPtr consoleHandle, uint mode);
+
+        /// <summary>Invalid handle sentinel value (-1).</summary>
+        internal static readonly IntPtr INVALID_HANDLE_VALUE = new IntPtr(-1);
+
+        // =================================================================
+        // Named Pipe API
+        // =================================================================
+
+        internal const uint PIPE_ACCESS_DUPLEX = 0x00000003;
+        internal const uint PIPE_ACCESS_INBOUND = 0x00000001;
+        internal const uint PIPE_ACCESS_OUTBOUND = 0x00000002;
+        internal const uint PIPE_ACCESS_OVERLAPPED = 0x40000000; // flag, not exclusive
+
+        internal const uint PIPE_TYPE_BYTE = 0x00000000;
+        internal const uint PIPE_TYPE_MESSAGE = 0x00000004;
+        internal const uint PIPE_READMODE_BYTE = 0x00000000;
+        internal const uint PIPE_READMODE_MESSAGE = 0x00000002;
+        internal const uint PIPE_WAIT = 0x00000000;
+        internal const uint PIPE_NOWAIT = 0x00000001;
+        internal const uint PIPE_UNLIMITED_INSTANCES = 255;
+
+        internal const uint NMPWAIT_USE_DEFAULT_WAIT = 0x00000000;
+        internal const uint NMPWAIT_NOWAIT = 0x00000001;
+        internal const uint NMPWAIT_WAIT_FOREVER = 0xFFFFFFFF;
+
+        internal const uint ERROR_PIPE_BUSY = 231;
+        internal const uint ERROR_NO_DATA = 232;
+        internal const uint ERROR_PIPE_NOT_CONNECTED = 233;
+        internal const uint ERROR_BROKEN_PIPE = 109;
+        internal const uint ERROR_PIPE_LISTENING = 536;
+        internal const uint ERROR_PIPE_CONNECTED = 535;
+        internal const uint ERROR_SEM_TIMEOUT = 121;
+
+        // File API constants
+        internal const uint GENERIC_READ = 0x80000000;
+        internal const uint GENERIC_WRITE = 0x40000000;
+        internal const uint OPEN_EXISTING = 3;
+
+        [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+        internal static extern IntPtr CreateNamedPipeW(
+            string lpName,
+            uint dwOpenMode,
+            uint dwPipeMode,
+            uint nMaxInstances,
+            uint nOutBufferSize,
+            uint nInBufferSize,
+            uint nDefaultTimeOut,
+            IntPtr lpSecurityAttributes);
+
+        [DllImport("kernel32.dll", SetLastError = true)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        internal static extern bool ConnectNamedPipe(
+            IntPtr hNamedPipe,
+            IntPtr lpOverlapped);
+
+        [DllImport("kernel32.dll", SetLastError = true)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        internal static extern bool DisconnectNamedPipe(IntPtr hNamedPipe);
+
+        [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        internal static extern bool CallNamedPipeW(
+            string lpNamedPipeName,
+            byte[]? lpInBuffer,
+            uint nInBufferSize,
+            [Out] byte[]? lpOutBuffer,
+            uint nOutBufferSize,
+            out uint lpBytesRead,
+            uint nTimeOut);
+
+        [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        internal static extern bool WaitNamedPipeW(
+            string lpNamedPipeName,
+            uint nTimeOut);
+
+        [DllImport("kernel32.dll", SetLastError = true)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        internal static extern bool SetNamedPipeHandleState(
+            IntPtr hNamedPipe,
+            ref uint lpMode,
+            IntPtr lpMaxCollectionCount,
+            IntPtr lpCollectDataTimeout);
+
+        [DllImport("kernel32.dll", SetLastError = true)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        internal static extern bool GetNamedPipeHandleStateW(
+            IntPtr hNamedPipe,
+            out uint lpState,
+            out uint lpCurInstances,
+            out uint lpMaxCollectionCount,
+            out uint lpCollectDataTimeout,
+            StringBuilder lpUserName,
+            uint nMaxUserNameSize);
+
+        [DllImport("kernel32.dll", SetLastError = true)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        internal static extern bool ImpersonateNamedPipeClient(IntPtr hNamedPipe);
+
+        [DllImport("kernel32.dll", SetLastError = true)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        internal static extern bool RevertToSelf();
+
+        [DllImport("kernel32.dll", SetLastError = true)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        internal static extern bool ReadFile(
+            IntPtr hFile,
+            [Out] byte[] lpBuffer,
+            uint nNumberOfBytesToRead,
+            out uint lpNumberOfBytesRead,
+            IntPtr lpOverlapped);
+
+        [DllImport("kernel32.dll", SetLastError = true)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        internal static extern bool WriteFile(
+            IntPtr hFile,
+            byte[] lpBuffer,
+            uint nNumberOfBytesToWrite,
+            out uint lpNumberOfBytesWritten,
+            IntPtr lpOverlapped);
+
+        [DllImport("kernel32.dll", SetLastError = true)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        internal static extern bool FlushFileBuffers(IntPtr hFile);
+
+        [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+        internal static extern IntPtr CreateFileW(
+            string lpFileName,
+            uint dwDesiredAccess,
+            uint dwShareMode,
+            IntPtr lpSecurityAttributes,
+            uint dwCreationDisposition,
+            uint dwFlagsAndAttributes,
+            IntPtr hTemplateFile);
+
+        // =================================================================
+        // Memory-Mapped File API
+        // =================================================================
+
+        internal const uint PAGE_READONLY = 0x02;
+        internal const uint PAGE_READWRITE = 0x04;
+        internal const uint PAGE_WRITECOPY = 0x08;
+        internal const uint PAGE_EXECUTE_READ = 0x20;
+        internal const uint PAGE_EXECUTE_READWRITE = 0x40;
+
+        internal const uint FILE_MAP_WRITE = 0x0002;
+        internal const uint FILE_MAP_READ = 0x0004;
+        internal const uint FILE_MAP_ALL_ACCESS = 0xF001F;
+        internal const uint FILE_MAP_COPY = 0x0001;
+        internal const uint FILE_MAP_EXECUTE = 0x0020;
+
+        internal const uint SECTION_MAP_WRITE = 0x0002;
+        internal const uint SECTION_MAP_READ = 0x0004;
+        internal const uint SECTION_QUERY = 0x0001;
+
+        internal const uint SEC_COMMIT = 0x80000000;
+        internal const uint SEC_IMAGE = 0x1000000;
+        internal const uint SEC_RESERVE = 0x4000000;
+        internal const uint SEC_LARGE_PAGES = 0x80000000;
+
+        internal const uint INVALID_FILE_SIZE = 0xFFFFFFFF;
+
+        [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+        internal static extern IntPtr CreateFileMappingW(
+            IntPtr hFile,
+            IntPtr lpFileMappingAttributes,
+            uint flProtect,
+            uint dwMaximumSizeHigh,
+            uint dwMaximumSizeLow,
+            string? lpName);
+
+        [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+        internal static extern IntPtr OpenFileMappingW(
+            uint dwDesiredAccess,
+            [MarshalAs(UnmanagedType.Bool)] bool bInheritHandle,
+            string lpName);
+
+        [DllImport("kernel32.dll", SetLastError = true)]
+        internal static extern IntPtr MapViewOfFile(
+            IntPtr hFileMappingObject,
+            uint dwDesiredAccess,
+            uint dwFileOffsetHigh,
+            uint dwFileOffsetLow,
+            IntPtr dwNumberOfBytesToMap);
+
+        [DllImport("kernel32.dll", SetLastError = true)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        internal static extern bool UnmapViewOfFile(IntPtr lpBaseAddress);
+
+        [DllImport("kernel32.dll", SetLastError = true)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        internal static extern bool GetProcessWorkingSetSizeEx(
+            IntPtr hProcess,
+            out IntPtr lpMinimumWorkingSetSize,
+            out IntPtr lpMaximumWorkingSetSize,
+            out uint lpFlags);
+
+        [StructLayout(LayoutKind.Sequential)]
+        internal struct MEMORY_BASIC_INFORMATION64
+        {
+            public IntPtr BaseAddress;
+            public IntPtr AllocationBase;
+            public uint AllocationProtect;
+            public uint __alignment1;
+            public long RegionSize;
+            public uint State;
+            public uint Protect;
+            public uint Type;
+            public uint __alignment2;
+        }
+
+        [DllImport("kernel32.dll", SetLastError = true)]
+        internal static extern int VirtualQuery(
+            IntPtr lpAddress,
+            out MEMORY_BASIC_INFORMATION64 lpBuffer,
+            int dwLength);
     }
 }
