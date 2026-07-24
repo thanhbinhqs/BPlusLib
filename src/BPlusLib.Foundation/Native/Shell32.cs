@@ -228,8 +228,33 @@ namespace BPlusLib.Foundation.Native
         internal const uint NIIF_NOSOUND = 0x10;
         internal const uint NIIF_LARGE_ICON = 0x20;
         internal const uint NIIF_RESPECT_QUIET_TIME = 0x80;
-    }
 
+        // =================================================================
+        // ITaskbarList3 COM interface (Shell32)
+        // =================================================================
+
+        [ComImport]
+        [Guid("ea1afb91-9e28-4b86-90c9-99e552575ef7")]
+        [InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
+        internal interface ITaskbarList3
+        {
+            void HrInit();
+            void AddTab(IntPtr hwnd);
+            void DeleteTab(IntPtr hwnd);
+            void ActivateTab(IntPtr hwnd);
+            void SetActiveAlt(IntPtr hwnd);
+            void SetProgressValue(IntPtr hwnd, ulong ullCompleted, ulong ullTotal);
+            void SetProgressState(IntPtr hwnd, uint tbpFlags);
+        }
+
+        internal const uint TBPF_NOPROGRESS = 0;
+        internal const uint TBPF_INDETERMINATE = 0x1;
+        internal const uint TBPF_NORMAL = 0x2;
+        internal const uint TBPF_ERROR = 0x4;
+        internal const uint TBPF_PAUSED = 0x8;
+
+        internal static readonly Guid CLSID_TaskbarList = new("56FDF344-FD50-4F20-9C20-4C1CEB7E8B30");
+    }
     /// <summary>NOTIFYICONDATAW structure for Shell_NotifyIconW.</summary>
     [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
     internal struct NOTIFYICONDATAW
