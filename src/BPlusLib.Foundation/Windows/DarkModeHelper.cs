@@ -236,10 +236,9 @@ namespace BPlusLib.Foundation.Windows
 
         private static IntPtr GetProcessWindow()
         {
-            // Use current thread's message window
-            return Kernel32.GetCurrentProcess() != IntPtr.Zero
-                ? Kernel32.GetCurrentProcess()
-                : IntPtr.Zero;
+            // Use desktop window handle for DWM API capability check
+            IntPtr hwnd = User32.GetDesktopWindow();
+            return hwnd != IntPtr.Zero ? hwnd : IntPtr.Zero;
         }
     }
 }

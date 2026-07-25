@@ -398,6 +398,12 @@ namespace BPlusLib.Foundation.Native
         internal static extern IntPtr MonitorFromPoint(POINT pt, uint dwFlags);
 
         /// <summary>
+        /// Retrieves a handle to the desktop window.
+        /// </summary>
+        [DllImport("user32.dll")]
+        internal static extern IntPtr GetDesktopWindow();
+
+        /// <summary>
         /// Retrieves information about a display monitor.
         /// </summary>
         [DllImport("user32.dll", SetLastError = true)]

@@ -553,6 +553,7 @@ namespace BPlusLib.Foundation.Networking
                 return;
             }
 
+            _disposed = true;
             try
             {
                 _udpClient.Close();

@@ -35,6 +35,7 @@ namespace BPlusLib.Foundation.Networking
     public sealed class TcpConnection : IDisposable
     {
         private readonly TcpClient _tcpClient;
+        private readonly object _streamLock = new();
         private NetworkStream? _stream;
         private readonly SemaphoreSlim _sendLock = new(1, 1);
         private readonly SemaphoreSlim _receiveLock = new(1, 1);
@@ -141,14 +142,20 @@ namespace BPlusLib.Foundation.Networking
 
         /// <summary>
         /// Gets the underlying <see cref="NetworkStream"/>, creating it lazily
-        /// if necessary.
+        /// if necessary. Thread-safe via double-checked locking.
         /// </summary>
         /// <returns>The <see cref="NetworkStream"/> for the current connection.</returns>
         private NetworkStream GetStream()
         {
             if (_stream == null)
             {
-                _stream = _tcpClient.GetStream();
+                lock (_streamLock)
+                {
+                    if (_stream == null)
+                    {
+                        _stream = _tcpClient.GetStream();
+                    }
+                }
             }
 
             return _stream;
@@ -175,7 +182,7 @@ namespace BPlusLib.Foundation.Networking
                 }
 
                 int actualCount = count ?? (data.Length - offset);
-                if (offset < 0 || offset >= data.Length || actualCount < 0)
+                if (offset < 0 || offset >= data.Length || actualCount < 0 || offset + actualCount > data.Length)
                 {
                     return false;
                 }
@@ -291,7 +298,7 @@ namespace BPlusLib.Foundation.Networking
                 }
 
                 int actualCount = count ?? (data.Length - offset);
-                if (offset < 0 || offset >= data.Length || actualCount < 0)
+                if (offset < 0 || offset >= data.Length || actualCount < 0 || offset + actualCount > data.Length)
                 {
                     return false;
                 }
@@ -424,6 +431,7 @@ namespace BPlusLib.Foundation.Networking
                 return;
             }
 
+            _disposed = true;
             try
             {
                 if (_stream != null)

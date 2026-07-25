@@ -170,11 +170,13 @@ namespace BPlusLib.Foundation.Security
 
         private static string? GetSignerName(string filePath)
         {
+            IntPtr pFilePath = IntPtr.Zero;
             try
             {
+                pFilePath = Marshal.StringToHGlobalUni(filePath);
                 if (!Crypt32.CryptQueryObject(
                         Crypt32.CERT_QUERY_OBJECT_FILE,
-                        Marshal.StringToHGlobalUni(filePath),
+                        pFilePath,
                         Crypt32.CERT_QUERY_CONTENT_FLAG_PKCS7_SIGNED_EMBED,
                         Crypt32.CERT_QUERY_FORMAT_FLAG_ALL,
                         0,
@@ -224,6 +226,11 @@ namespace BPlusLib.Foundation.Security
             catch
             {
                 // Signer name is optional
+            }
+            finally
+            {
+                if (pFilePath != IntPtr.Zero)
+                    Marshal.FreeHGlobal(pFilePath);
             }
 
             return null;

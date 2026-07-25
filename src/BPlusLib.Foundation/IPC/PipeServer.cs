@@ -55,6 +55,8 @@ namespace BPlusLib.Foundation.IPC
                 // Create the pipe if not already created
                 if (_handle == IntPtr.Zero)
                 {
+                    // NMPWAIT_WAIT_FOREVER = 0xFFFFFFFF for infinite timeout
+                    uint defaultTimeout = timeoutMs < 0 ? 0xFFFFFFFF : (uint)Math.Max(0, timeoutMs);
                     _handle = Kernel32.CreateNamedPipeW(
                         PipePath,
                         Kernel32.PIPE_ACCESS_DUPLEX,
@@ -62,7 +64,7 @@ namespace BPlusLib.Foundation.IPC
                         _maxInstances,
                         _bufferSize,
                         _bufferSize,
-                        (uint)Math.Max(0, timeoutMs),
+                        defaultTimeout,
                         IntPtr.Zero);
 
                     if (_handle == Kernel32.INVALID_HANDLE_VALUE)

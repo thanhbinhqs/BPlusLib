@@ -31,8 +31,8 @@ namespace BPlusLib.Foundation.Networking
     {
         private readonly TcpListener _listener;
         private readonly SemaphoreSlim _acceptLock = new(1, 1);
-        private bool _disposed;
-        private bool _isRunning;
+        private volatile bool _disposed;
+        private volatile bool _isRunning;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="TcpServer"/> class and starts
@@ -106,10 +106,7 @@ namespace BPlusLib.Foundation.Networking
         {
             get
             {
-                lock (_acceptLock)
-                {
-                    return _isRunning;
-                }
+                return _isRunning;
             }
         }
 
