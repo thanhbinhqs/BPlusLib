@@ -7,6 +7,7 @@ using System;
 using System.Diagnostics;
 using System.IO;
 using System.IO.Compression;
+using System.Reflection;
 #if !NET472
 using System.Net.Http;
 using System.Text.Json;
@@ -73,6 +74,7 @@ namespace BPlusLib.Foundation.Windows
 
         /// <summary>
         /// Performs complete self-update: check → download → backup → replace → restart.
+        /// If <paramref name="currentVersion"/> is null, version is auto-detected from the running assembly.
         /// </summary>
         public static async Task<UpdateResult> UpdateAsync(
             string apiUrl, Version? currentVersion = null,
@@ -80,6 +82,9 @@ namespace BPlusLib.Foundation.Windows
         {
             if (string.IsNullOrEmpty(apiUrl))
                 return new UpdateResult { ErrorMessage = "API URL is required." };
+
+            // Auto-detect version if not provided
+            currentVersion ??= GetCurrentVersion();
 
             var info = await CheckForUpdateAsync(apiUrl, currentVersion);
             if (info is null)
@@ -107,11 +112,16 @@ namespace BPlusLib.Foundation.Windows
             return new UpdateResult { Success = true, UpdateInfo = info };
         }
 
-        /// <summary>Checks API for updates.</summary>
+        /// <summary>
+        /// Checks API for updates. If <paramref name="currentVersion"/> is null, version is auto-detected.
+        /// </summary>
         public static async Task<AppUpdateInfo?> CheckForUpdateAsync(
             string apiUrl, Version? currentVersion = null)
         {
             if (string.IsNullOrEmpty(apiUrl)) return null;
+
+            // Auto-detect version if not provided
+            currentVersion ??= GetCurrentVersion();
 #if NET472
             await Task.CompletedTask;
             return null;
@@ -199,6 +209,50 @@ namespace BPlusLib.Foundation.Windows
             string dir = Path.Combine(Path.GetTempPath(), UpdaterRoot, $"update_{DateTime.Now:yyyyMMdd_HHmmss}_{System.Diagnostics.Process.GetCurrentProcess().Id}");
             Directory.CreateDirectory(dir);
             return dir;
+        }
+
+        /// <summary>
+        /// Auto-detects current app version. Priority:
+        /// 1. Entry assembly version (the actual running app)
+        /// 2. Executing assembly version (this library)
+        /// 3. File version from the EXE on disk
+        /// </summary>
+        public static Version? GetCurrentVersion()
+        {
+            try
+            {
+                // Try entry assembly first — the actual running application
+                var entry = Assembly.GetEntryAssembly();
+                if (entry != null)
+                {
+                    var v = entry.GetName().Version;
+                    if (v != null && (v.Major > 0 || v.Minor > 0 || v.Build > 0)) return v;
+                }
+            }
+            catch { }
+
+            try
+            {
+                // Fallback: executing assembly (this library itself)
+                var v = Assembly.GetExecutingAssembly().GetName().Version;
+                if (v != null && (v.Major > 0 || v.Minor > 0 || v.Build > 0)) return v;
+            }
+            catch { }
+
+            try
+            {
+                // Last resort: read FileVersion from the EXE on disk
+                string exePath = GetCurrentExePath();
+                if (!string.IsNullOrEmpty(exePath) && File.Exists(exePath))
+                {
+                    var vi = FileVersionInfo.GetVersionInfo(exePath);
+                    if (!string.IsNullOrEmpty(vi.FileVersion))
+                        return Version.Parse(vi.FileVersion);
+                }
+            }
+            catch { }
+
+            return null;
         }
 
         private static string GetCurrentExePath()

@@ -106,6 +106,27 @@ namespace BPlusLib.Foundation.Tests.Windows
         }
 
         // =================================================================
+        // GetCurrentVersion tests
+        // =================================================================
+
+        [Fact]
+        public void GetCurrentVersion_ReturnsNonNull()
+        {
+            // Running in test runner — entry assembly should have a version
+            var version = AppUpdater.GetCurrentVersion();
+            version.Should().NotBeNull();
+        }
+
+        [Fact]
+        public void GetCurrentVersion_ReturnsValidVersion()
+        {
+            var version = AppUpdater.GetCurrentVersion();
+            version.Should().NotBeNull();
+            version!.Major.Should().BeGreaterOrEqualTo(0);
+            version.Minor.Should().BeGreaterOrEqualTo(0);
+        }
+
+        // =================================================================
         // CheckForUpdate tests
         // =================================================================
 
