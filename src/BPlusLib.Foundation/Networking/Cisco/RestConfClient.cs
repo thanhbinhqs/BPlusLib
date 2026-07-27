@@ -4,9 +4,9 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Net.Security;
 using System.Text;
-using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
+using Newtonsoft.Json.Linq;
 
 namespace BPlusLib.Foundation.Networking.Cisco
 {
@@ -35,9 +35,9 @@ namespace BPlusLib.Foundation.Networking.Cisco
             int port = 443,
             bool ignoreCertificateErrors = true)
         {
-            ArgumentException.ThrowIfNullOrWhiteSpace(host);
-            ArgumentException.ThrowIfNullOrWhiteSpace(username);
-            ArgumentException.ThrowIfNullOrWhiteSpace(password);
+            if (string.IsNullOrWhiteSpace(host)) throw new ArgumentException("Host cannot be null or empty.", nameof(host));
+            if (string.IsNullOrWhiteSpace(username)) throw new ArgumentException("Username cannot be null or empty.", nameof(username));
+            if (string.IsNullOrWhiteSpace(password)) throw new ArgumentException("Password cannot be null or empty.", nameof(password));
 
             _baseUrl = $"https://{host}:{port}";
 
@@ -71,23 +71,23 @@ namespace BPlusLib.Foundation.Networking.Cisco
 
         /// <summary>
         /// Performs a GET request and deserializes the JSON response.
-        /// Returns <c>default</c> on failure.
+        /// Returns <c>null</c> on failure.
         /// </summary>
-        /// <param name="path">The RESTCONF resource path (e.g., "/restconf/data/Cisco-IOS-XE-wireless-access-point-oper:access-point-oper-data").</param>
+        /// <param name="path">The RESTCONF resource path.</param>
         /// <param name="cancellationToken">Cancellation token.</param>
-        /// <returns>The deserialized <see cref="JsonElement"/>, or <c>default</c> on failure.</returns>
-        public async Task<JsonElement> GetAsync(string path, CancellationToken cancellationToken = default)
+        /// <returns>The parsed <see cref="JObject"/>, or <c>null</c> on failure.</returns>
+        public async Task<JObject?> GetAsync(string path, CancellationToken cancellationToken = default)
         {
             try
             {
                 using var response = await _httpClient.GetAsync(path, cancellationToken).ConfigureAwait(false);
                 response.EnsureSuccessStatusCode();
-                var json = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
-                return JsonSerializer.Deserialize<JsonElement>(json);
+                var json = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+                return JObject.Parse(json);
             }
             catch
             {
-                return default;
+                return null;
             }
         }
 
@@ -126,7 +126,7 @@ namespace BPlusLib.Foundation.Networking.Cisco
             {
                 using var response = await _httpClient.GetAsync(path, cancellationToken).ConfigureAwait(false);
                 response.EnsureSuccessStatusCode();
-                return await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
+                return await response.Content.ReadAsStringAsync().ConfigureAwait(false);
             }
             catch
             {
@@ -135,8 +135,7 @@ namespace BPlusLib.Foundation.Networking.Cisco
         }
 
         /// <summary>
-        /// Tests whether the WLC is reachable over HTTPS by performing a lightweight GET
-        /// against the RESTCONF API.
+        /// Tests whether the WLC is reachable over HTTPS.
         /// </summary>
         /// <param name="cancellationToken">Cancellation token.</param>
         /// <returns><c>true</c> if the device responded; otherwise, <c>false</c>.</returns>
@@ -155,22 +154,20 @@ namespace BPlusLib.Foundation.Networking.Cisco
 
         /// <summary>
         /// Retrieves the list of YANG modules supported by the WLC.
-        /// Returns an empty array on failure.
         /// </summary>
         /// <param name="cancellationToken">Cancellation token.</param>
-        /// <returns>A <see cref="JsonElement"/> containing the YANG module list, or empty on failure.</returns>
-        public async Task<JsonElement> GetYangModulesAsync(CancellationToken cancellationToken = default)
+        /// <returns>A <see cref="JObject"/> containing the YANG module list, or <c>null</c> on failure.</returns>
+        public async Task<JObject?> GetYangModulesAsync(CancellationToken cancellationToken = default)
         {
             return await GetAsync("/restconf/data/netconf-state/schemas", cancellationToken).ConfigureAwait(false);
         }
 
         /// <summary>
         /// Retrieves the RESTCONF server capabilities.
-        /// Returns an empty <see cref="JsonElement"/> on failure.
         /// </summary>
         /// <param name="cancellationToken">Cancellation token.</param>
-        /// <returns>A <see cref="JsonElement"/> containing the capabilities, or empty on failure.</returns>
-        public async Task<JsonElement> GetCapabilitiesAsync(CancellationToken cancellationToken = default)
+        /// <returns>A <see cref="JObject"/> containing the capabilities, or <c>null</c> on failure.</returns>
+        public async Task<JObject?> GetCapabilitiesAsync(CancellationToken cancellationToken = default)
         {
             return await GetAsync("/restconf", cancellationToken).ConfigureAwait(false);
         }
