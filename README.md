@@ -1,6 +1,6 @@
 # BPlusLib.Foundation
 
-**Enterprise-grade Windows Foundation Library — 28 modules, 1164+ tests, pure P/Invoke.**
+**Enterprise-grade Windows Foundation Library — 31 modules, 1,275 tests, pure P/Invoke.**
 
 ---
 
@@ -11,9 +11,9 @@ BPlusLib.Foundation is a production-ready C# utility library for Windows desktop
 | | |
 |---|---|
 | **Targets** | net472 · net6.0 · net8.0 |
-| **Version** | 2.6.0 |
+| **Version** | 2.8.0 |
 | **License** | MIT |
-| **Tests** | 1,164 (1,082 passing) |
+| **Tests** | 1,275 (1,183 passing, 92 skipped — Windows-only) |
 | **Author** | [thanhbinhqs](https://github.com/thanhbinhqs) |
 
 ---
@@ -59,6 +59,17 @@ var cred = CredentialHelper.Read("myapp:user");
 using var pipeServer = new PipeServer("BPlusLibTest");
 pipeServer.WaitForConnection(5000);
 pipeServer.Write(Encoding.UTF8.GetBytes("response"));
+
+// Auto-update
+using BPlusLib.Foundation.Windows;
+await AppUpdater.UpdateAsync("https://example.com/releases/latest.zip");
+
+// Cisco EWC (RESTCONF + Syslog)
+using BPlusLib.Foundation.Networking.Cisco;
+var device = await CiscoEwcHelper.GetDeviceInfoAsync("192.168.1.1", "admin", "pass");
+var aps = await CiscoEwcHelper.GetAccessPointsAsync("192.168.1.1", "admin", "pass");
+var clients = await CiscoEwcHelper.GetClientsAsync("192.168.1.1", "admin", "pass");
+using var syslog = CiscoEwcHelper.StartSyslogListener(514, entry => Console.WriteLine($"[{entry.Severity}] {entry.Message}"));
 ```
 
 ---
@@ -85,6 +96,37 @@ Foundational types: `Guard`, `Result<T>`, `Option<T>`, `AsyncLock`, `AsyncCache`
 
 ### 🔌 Networking
 `TcpConnection` — full-duplex TCP wrapper · `TcpServer` — async accept · `TcpSocketHelper` — static connect/start · `UdpEndpoint` — send/receive/broadcast/multicast · `UdpSocketHelper` — static one-shot · `NetClientHelper` — HTTP GET/POST/PUT/DELETE, FTP · `HttpListenerHelper` — embedded localhost HTTP server.
+
+### 🐦 Cisco EWC
+`CiscoEwcHelper` — static facade for Cisco EWC via RESTCONF (RFC 8040) · `RestConfClient` — HTTPS client with Basic auth, Newtonsoft.Json · `YangParser` — parse YANG model JSON responses (device info, APs, clients, SSIDs) · `SyslogServer` — UDP syslog listener (RFC 5424) with real-time callbacks.
+
+```csharp
+using BPlusLib.Foundation.Networking.Cisco;
+
+// Device info
+var device = await CiscoEwcHelper.GetDeviceInfoAsync("192.168.1.1", "admin", "pass");
+
+// Access points
+var aps = await CiscoEwcHelper.GetAccessPointsAsync("192.168.1.1", "admin", "pass");
+
+// Connected clients
+var clients = await CiscoEwcHelper.GetClientsAsync("192.168.1.1", "admin", "pass");
+
+// Configured SSIDs
+var ssids = await CiscoEwcHelper.GetSsidsAsync("192.168.1.1", "admin", "pass");
+
+// Raw YANG data
+var raw = await CiscoEwcHelper.GetYangDataAsync("192.168.1.1", "admin", "pass",
+    "/Cisco-IOS-XE-wireless-access-point-oper:access-point-oper-data");
+
+// Syslog (real-time)
+using var syslog = CiscoEwcHelper.StartSyslogListener(514, entry =>
+    Console.WriteLine($"[{entry.Severity}] {entry.Hostname}: {entry.Message}"));
+
+// Diagnostics
+bool ok = await CiscoEwcHelper.IsReachableAsync("192.168.1.1", "admin", "pass");
+var caps = await CiscoEwcHelper.GetCapabilitiesAsync("192.168.1.1", "admin", "pass");
+```
 
 ### 📁 IO
 `SafeFileOps` — atomic write, retry copy/move, lock detection · `PathHelper` — sanitize, normalize, relative paths · `ChecksumHelper` — MD5/SHA1/SHA256/SHA512/CRC32 · `FileVersionHelper` — PE version resources (VerQueryValue).
@@ -125,6 +167,18 @@ Foundational types: `Guard`, `Result<T>`, `Option<T>`, `AsyncLock`, `AsyncCache`
 ### 📱 Device
 `DeviceHelper` — USB detection, volume info, SetupAPI device enumeration.
 
+### 🔧 Hardware
+`HardwareDeviceHelper` — USB speed detection (Low/Full/High/Super/SuperSpeed+), VID/PID/Serial parsing via SetupAPI · `UsbDeviceParser` — USB descriptor string parsing · `DeviceInfoParser` — device instance ID parsing.
+
+```csharp
+using BPlusLib.Foundation.Hardware;
+
+// Get all USB devices
+var devices = HardwareDeviceHelper.GetUsbDevices();
+foreach (var dev in devices)
+    Console.WriteLine($"{dev.FriendlyName} — {dev.UsbSpeed} — VID:{dev.VendorId} PID:{dev.ProductId}");
+```
+
 ### 🌍 Localization
 `LocalizationHelper` — multi-language .resx loading, culture switching.
 
@@ -146,6 +200,26 @@ Foundational types: `Guard`, `Result<T>`, `Option<T>`, `AsyncLock`, `AsyncCache`
 ### ⚡ Power
 `PowerHelper` — sleep, hibernate, shutdown, restart, lock, battery status, prevent sleep.
 
+### 🪟 Windows
+`AppUpdater` — self-contained auto-updater (lock, download, extract, backup, replace, verify, rollback) · `AutoStartHelper` — registry-based auto-start management · `AutoUpdateHelper` — version checking and update orchestration · `DarkModeHelper` — dark/light mode for WinForms controls · `SingleInstanceHelper` — single-instance application enforcement · `TaskbarProgressHelper` — taskbar progress bar (ITaskbarList3) · `WindowManager` — window state management · `NetworkMonitorHelper` — network connectivity monitoring · `GlobalExceptionHandler` — unhandled exception capture · `FileAssociationHelper` — file type association registration · `CustomWindowHelper` — custom window chrome.
+
+```csharp
+using BPlusLib.Foundation.Windows;
+
+// Auto-update (self-contained)
+await AppUpdater.UpdateAsync("https://example.com/releases/latest.zip");
+
+// Single instance
+var single = SingleInstance.Create("MyApp");
+if (!single.TryAcquire()) return;
+
+// Dark mode for WinForms
+DarkModeHelper.EnableDarkMode(myForm);
+```
+
+### 🔧 Utils
+`EnvironmentHelper` — environment variable management · `FileVersionHelper` — file version info extraction.
+
 ---
 
 ## Architecture
@@ -165,13 +239,14 @@ BPlusLib.Foundation/
 │   ├── PsApi.cs
 │   ├── RstrtMgr.cs
 │   ├── VersionApi.cs
-│   └── Interop/
+│   └── SetupApi.cs
 ├── Window/          ← Monitor, Drag, Resize, Animation
 ├── Dialogs/         ← MessageBoxEx, InputBox, Progress
 ├── SystemInfo/      ← OS, CPU, Memory, Disk, Battery, ...
 ├── Process/         ← CommandRunner, ProcessExtensions
 ├── Network/         ← Ping, TCP/UDP table, ARP, DNS, WOL
 ├── Networking/      ← TCP/UDP sockets, HTTP/FTP client, HTTP server
+│   └── Cisco/       ← RESTCONF client, YANG parser, Syslog server
 ├── IO/              ← SafeFileOps, Path, Checksum, FileVersion
 ├── Registry/        ← Registry CRUD, export/import
 ├── Security/        ← Token, Privilege, Integrity, UAC, Credential, WinTrust
@@ -185,14 +260,30 @@ BPlusLib.Foundation/
 ├── Graphics/        ← Screen, Icons, DPI
 ├── Shell/           ← Verbs, Associations, Theme, NotifyIcon, Shortcut
 ├── Device/          ← USB, Volume, SetupAPI
+├── Hardware/        ← USB speed detection, VID/PID parsing
 ├── Localization/    ← Multi-language .resx
 ├── Threading/       ← STA/MTA
 ├── SerialPorts/     ← COM port owner identification
 ├── Services/        ← Service, Job Object, Console, Restart Manager
 ├── Input/           ← SendInput, RegisterHotKey
 ├── IPC/             ← Named pipes
-└── Power/           ← Sleep, Hibernate, Shutdown
+├── Power/           ← Sleep, Hibernate, Shutdown
+├── Windows/         ← AppUpdater, DarkMode, SingleInstance, Taskbar
+└── Utils/           ← Environment, FileVersion
 ```
+
+---
+
+## Dependencies
+
+| Package | Version | Scope |
+|---------|---------|-------|
+| Newtonsoft.Json | 13.0.3 | All TFMs (Cisco EWC module) |
+| Microsoft.Bcl.HashCode | 1.1.1 | net472, net6.0 |
+| System.Threading.Tasks.Extensions | 4.5.4 | net472, net6.0 |
+| System.Memory | 4.5.5 | net472, net6.0 |
+| System.Net.Http | 4.3.4 | net472, net6.0 |
+| System.Diagnostics.EventLog | 6.0.0 | net6.0, net8.0 |
 
 ---
 
@@ -217,6 +308,7 @@ All P/Invoke — no managed wrappers or external dependencies.
 | shcore | Graphics (DPI) |
 | netapi32 | Environment (domain join) |
 | shlwapi | Shell (AssocQueryString) |
+| setupapi | Hardware (device enumeration, USB speed) |
 
 ---
 
@@ -234,7 +326,11 @@ dotnet pack -c Release
 ```
 Source: https://nuget.pkg.github.com/thanhbinhqs/index.json
 Package: BPlusLib.Foundation
-Version: 2.6.0
+Version: 2.8.0
+```
+
+```bash
+dotnet add package BPlusLib.Foundation --version 2.8.0 --source "https://nuget.pkg.github.com/thanhbinhqs/index.json"
 ```
 
 ## License
