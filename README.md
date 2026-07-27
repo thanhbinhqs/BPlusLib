@@ -134,7 +134,7 @@ Foundational types: `Guard`, `Result<T>`, `Option<T>`, `AsyncLock`, `AsyncCache`
 `TcpConnection` — full-duplex TCP wrapper · `TcpServer` — async accept · `TcpSocketHelper` — static connect/start · `UdpEndpoint` — send/receive/broadcast/multicast · `UdpSocketHelper` — static one-shot · `NetClientHelper` — HTTP GET/POST/PUT/DELETE, FTP · `HttpListenerHelper` — embedded localhost HTTP server. [**→ Full Documentation**](docs/modules/networking.md)
 
 ### 🐦 Cisco EWC
-`CiscoEwcHelper` — static facade for Cisco EWC via RESTCONF (RFC 8040) · `RestConfClient` — HTTPS client with Basic auth, Newtonsoft.Json · `YangParser` — parse YANG model JSON responses (device info, APs, clients, SSIDs) · `SyslogServer` — UDP syslog listener (RFC 5424) with real-time callbacks. [**→ Full Documentation**](docs/modules/cisco-ewc.md)
+`CiscoEwcHelper` — static facade for Cisco EWC via RESTCONF (RFC 8040) · `RestConfClient` — HTTPS client with Basic auth, Newtonsoft.Json · `YangParser` — parse YANG model JSON responses (device info, APs, clients, SSIDs, **RF radio data**, **RF profiles**, **AP profiles**) · `SyslogServer` — UDP syslog listener (RFC 5424) with real-time callbacks. [**→ Full Documentation**](docs/modules/cisco-ewc.md)
 
 ### 📁 IO
 `SafeFileOps` — atomic write, retry copy/move, lock detection · `PathHelper` — sanitize, normalize, relative paths · `ChecksumHelper` — MD5/SHA1/SHA256/SHA512/CRC32 · `FileVersionHelper` — PE version resources (VerQueryValue). [**→ Full Documentation**](docs/modules/io.md)
