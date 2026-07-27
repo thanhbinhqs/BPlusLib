@@ -347,6 +347,422 @@ namespace BPlusLib.Foundation.Networking.Cisco
             }
         }
 
+        /// <summary>
+        /// Gets AAA (Authentication, Authorization, Accounting) server configuration from the WLC via RESTCONF.
+        /// </summary>
+        public static async Task<List<CiscoAaaServerInfo>> GetAaaServersAsync(
+            string host,
+            string username,
+            string password,
+            int port = 443,
+            CancellationToken cancellationToken = default)
+        {
+            try
+            {
+                using var client = CreateClient(host, username, password, port);
+                var json = await client.GetAsync(
+                    "/restconf/data/Cisco-IOS-XE-aaa:aaa",
+                    cancellationToken).ConfigureAwait(false);
+                if (json == null)
+                    return new List<CiscoAaaServerInfo>();
+                return YangParser.ParseAaaServers(json);
+            }
+            catch
+            {
+                return new List<CiscoAaaServerInfo>();
+            }
+        }
+
+        /// <summary>
+        /// Gets QoS (Quality of Service) profile configuration from the WLC via RESTCONF.
+        /// </summary>
+        public static async Task<List<CiscoQosProfileInfo>> GetQosProfilesAsync(
+            string host,
+            string username,
+            string password,
+            int port = 443,
+            CancellationToken cancellationToken = default)
+        {
+            try
+            {
+                using var client = CreateClient(host, username, password, port);
+                var json = await client.GetAsync(
+                    "/restconf/data/Cisco-IOS-XE-wireless-qos-cfg:qos-cfg",
+                    cancellationToken).ConfigureAwait(false);
+                if (json == null)
+                    return new List<CiscoQosProfileInfo>();
+                return YangParser.ParseQosProfiles(json);
+            }
+            catch
+            {
+                return new List<CiscoQosProfileInfo>();
+            }
+        }
+
+        /// <summary>
+        /// Gets rogue access point detection data from the WLC via RESTCONF.
+        /// </summary>
+        public static async Task<List<CiscoRogueApInfo>> GetRogueApsAsync(
+            string host,
+            string username,
+            string password,
+            int port = 443,
+            CancellationToken cancellationToken = default)
+        {
+            try
+            {
+                using var client = CreateClient(host, username, password, port);
+                var json = await client.GetAsync(
+                    "/restconf/data/Cisco-IOS-XE-wireless-rogue-oper:rogue-oper-data",
+                    cancellationToken).ConfigureAwait(false);
+                if (json == null)
+                    return new List<CiscoRogueApInfo>();
+                return YangParser.ParseRogueAps(json);
+            }
+            catch
+            {
+                return new List<CiscoRogueApInfo>();
+            }
+        }
+
+        /// <summary>
+        /// Gets WIPS (Wireless Intrusion Prevention System) alert data from the WLC via RESTCONF.
+        /// </summary>
+        public static async Task<List<CiscoWipsAlertInfo>> GetWipsAlertsAsync(
+            string host,
+            string username,
+            string password,
+            int port = 443,
+            CancellationToken cancellationToken = default)
+        {
+            try
+            {
+                using var client = CreateClient(host, username, password, port);
+                var json = await client.GetAsync(
+                    "/restconf/data/Cisco-IOS-XE-wireless-wips-oper:wips-oper-data",
+                    cancellationToken).ConfigureAwait(false);
+                if (json == null)
+                    return new List<CiscoWipsAlertInfo>();
+                return YangParser.ParseWipsAlerts(json);
+            }
+            catch
+            {
+                return new List<CiscoWipsAlertInfo>();
+            }
+        }
+
+        /// <summary>
+        /// Gets license information (UDI) from the WLC via RESTCONF.
+        /// </summary>
+        public static async Task<List<CiscoLicenseInfo>> GetLicenseInfoAsync(
+            string host,
+            string username,
+            string password,
+            int port = 443,
+            CancellationToken cancellationToken = default)
+        {
+            try
+            {
+                using var client = CreateClient(host, username, password, port);
+                var json = await client.GetAsync(
+                    "/restconf/data/Cisco-IOS-XE-native:native/license/udi",
+                    cancellationToken).ConfigureAwait(false);
+                if (json == null)
+                    return new List<CiscoLicenseInfo>();
+                return YangParser.ParseLicenses(json);
+            }
+            catch
+            {
+                return new List<CiscoLicenseInfo>();
+            }
+        }
+
+        /// <summary>
+        /// Gets mobility peer configuration from the WLC via RESTCONF.
+        /// </summary>
+        public static async Task<List<CiscoMobilityInfo>> GetMobilityPeersAsync(
+            string host,
+            string username,
+            string password,
+            int port = 443,
+            CancellationToken cancellationToken = default)
+        {
+            try
+            {
+                using var client = CreateClient(host, username, password, port);
+                var json = await client.GetAsync(
+                    "/restconf/data/Cisco-IOS-XE-wireless-mobility:mobility",
+                    cancellationToken).ConfigureAwait(false);
+                if (json == null)
+                    return new List<CiscoMobilityInfo>();
+                return YangParser.ParseMobilityPeers(json);
+            }
+            catch
+            {
+                return new List<CiscoMobilityInfo>();
+            }
+        }
+
+        /// <summary>
+        /// Gets ACL (Access Control List) configuration from the WLC via RESTCONF.
+        /// </summary>
+        public static async Task<List<CiscoAclInfo>> GetAclsAsync(
+            string host,
+            string username,
+            string password,
+            int port = 443,
+            CancellationToken cancellationToken = default)
+        {
+            try
+            {
+                using var client = CreateClient(host, username, password, port);
+                var json = await client.GetAsync(
+                    "/restconf/data/Cisco-IOS-XE-wireless-acl-cfg:acl-cfg",
+                    cancellationToken).ConfigureAwait(false);
+                if (json == null)
+                    return new List<CiscoAclInfo>();
+                return YangParser.ParseAcls(json);
+            }
+            catch
+            {
+                return new List<CiscoAclInfo>();
+            }
+        }
+
+        /// <summary>
+        /// Gets management configuration from the WLC via RESTCONF.
+        /// </summary>
+        public static async Task<CiscoManagementInfo> GetManagementInfoAsync(
+            string host,
+            string username,
+            string password,
+            int port = 443,
+            CancellationToken cancellationToken = default)
+        {
+            try
+            {
+                using var client = CreateClient(host, username, password, port);
+                var json = await client.GetAsync(
+                    "/restconf/data/Cisco-IOS-XE-native:native/management",
+                    cancellationToken).ConfigureAwait(false);
+                if (json == null)
+                    return new CiscoManagementInfo();
+                return YangParser.ParseManagement(json);
+            }
+            catch
+            {
+                return new CiscoManagementInfo();
+            }
+        }
+
+        /// <summary>
+        /// Gets access point operational statistics from the WLC via RESTCONF.
+        /// </summary>
+        public static async Task<List<CiscoStatisticsInfo>> GetStatisticsAsync(
+            string host,
+            string username,
+            string password,
+            int port = 443,
+            CancellationToken cancellationToken = default)
+        {
+            try
+            {
+                using var client = CreateClient(host, username, password, port);
+                var json = await client.GetAsync(
+                    "/restconf/data/Cisco-IOS-XE-wireless-access-point-oper:access-point-oper-data",
+                    cancellationToken).ConfigureAwait(false);
+                if (json == null)
+                    return new List<CiscoStatisticsInfo>();
+                return YangParser.ParseStatistics(json);
+            }
+            catch
+            {
+                return new List<CiscoStatisticsInfo>();
+            }
+        }
+
+        /// <summary>
+        /// Gets FlexConnect configuration from the WLC via RESTCONF.
+        /// </summary>
+        public static async Task<List<CiscoFlexConnectInfo>> GetFlexConnectAsync(
+            string host,
+            string username,
+            string password,
+            int port = 443,
+            CancellationToken cancellationToken = default)
+        {
+            try
+            {
+                using var client = CreateClient(host, username, password, port);
+                var json = await client.GetAsync(
+                    "/restconf/data/Cisco-IOS-XE-wireless-flexconnect-cfg:flexconnect-cfg",
+                    cancellationToken).ConfigureAwait(false);
+                if (json == null)
+                    return new List<CiscoFlexConnectInfo>();
+                return YangParser.ParseFlexConnect(json);
+            }
+            catch
+            {
+                return new List<CiscoFlexConnectInfo>();
+            }
+        }
+
+        /// <summary>
+        /// Gets AP authorization configuration from the WLC via RESTCONF.
+        /// </summary>
+        public static async Task<List<CiscoApAuthorizationInfo>> GetApAuthorizationAsync(
+            string host,
+            string username,
+            string password,
+            int port = 443,
+            CancellationToken cancellationToken = default)
+        {
+            try
+            {
+                using var client = CreateClient(host, username, password, port);
+                var json = await client.GetAsync(
+                    "/restconf/data/Cisco-IOS-XE-wireless-ap-cfg:ap-cfg",
+                    cancellationToken).ConfigureAwait(false);
+                if (json == null)
+                    return new List<CiscoApAuthorizationInfo>();
+                return YangParser.ParseApAuthorization(json);
+            }
+            catch
+            {
+                return new List<CiscoApAuthorizationInfo>();
+            }
+        }
+
+        /// <summary>
+        /// Gets CleanAir interference detection data from the WLC via RESTCONF.
+        /// </summary>
+        public static async Task<List<CiscoCleanAirInfo>> GetCleanAirAsync(
+            string host,
+            string username,
+            string password,
+            int port = 443,
+            CancellationToken cancellationToken = default)
+        {
+            try
+            {
+                using var client = CreateClient(host, username, password, port);
+                var json = await client.GetAsync(
+                    "/restconf/data/Cisco-IOS-XE-wireless-cleanair-oper:cleanair-oper-data",
+                    cancellationToken).ConfigureAwait(false);
+                if (json == null)
+                    return new List<CiscoCleanAirInfo>();
+                return YangParser.ParseCleanAir(json);
+            }
+            catch
+            {
+                               return new List<CiscoCleanAirInfo>();
+            }
+        }
+
+        /// <summary>
+        /// Gets wired client operational data from the WLC via RESTCONF.
+        /// </summary>
+        public static async Task<List<CiscoWiredClientInfo>> GetWiredClientsAsync(
+            string host,
+            string username,
+            string password,
+            int port = 443,
+            CancellationToken cancellationToken = default)
+        {
+            try
+            {
+                using var client = CreateClient(host, username, password, port);
+                var json = await client.GetAsync(
+                    "/restconf/data/Cisco-IOS-XE-wireless-wired-client-oper:wired-client-oper-data",
+                    cancellationToken).ConfigureAwait(false);
+                if (json == null)
+                    return new List<CiscoWiredClientInfo>();
+                return YangParser.ParseWiredClients(json);
+            }
+            catch
+            {
+                return new List<CiscoWiredClientInfo>();
+            }
+        }
+
+        /// <summary>
+        /// Gets mesh network configuration from the WLC via RESTCONF.
+        /// </summary>
+        public static async Task<List<CiscoMeshInfo>> GetMeshInfoAsync(
+            string host,
+            string username,
+            string password,
+            int port = 443,
+            CancellationToken cancellationToken = default)
+        {
+            try
+            {
+                using var client = CreateClient(host, username, password, port);
+                var json = await client.GetAsync(
+                    "/restconf/data/Cisco-IOS-XE-wireless-mesh-cfg:mesh-cfg",
+                    cancellationToken).ConfigureAwait(false);
+                if (json == null)
+                    return new List<CiscoMeshInfo>();
+                return YangParser.ParseMeshInfo(json);
+            }
+            catch
+            {
+                return new List<CiscoMeshInfo>();
+            }
+        }
+
+        /// <summary>
+        /// Gets NTP (Network Time Protocol) configuration from the WLC via RESTCONF.
+        /// </summary>
+        public static async Task<CiscoNtpInfo> GetNtpInfoAsync(
+            string host,
+            string username,
+            string password,
+            int port = 443,
+            CancellationToken cancellationToken = default)
+        {
+            try
+            {
+                using var client = CreateClient(host, username, password, port);
+                var json = await client.GetAsync(
+                    "/restconf/data/Cisco-IOS-XE-native:native/clock",
+                    cancellationToken).ConfigureAwait(false);
+                if (json == null)
+                    return new CiscoNtpInfo();
+                return YangParser.ParseNtp(json);
+            }
+            catch
+            {
+                return new CiscoNtpInfo();
+            }
+        }
+
+        /// <summary>
+        /// Gets DNS (Domain Name System) configuration from the WLC via RESTCONF.
+        /// </summary>
+        public static async Task<CiscoDnsInfo> GetDnsInfoAsync(
+            string host,
+            string username,
+            string password,
+            int port = 443,
+            CancellationToken cancellationToken = default)
+        {
+            try
+            {
+                using var client = CreateClient(host, username, password, port);
+                var json = await client.GetAsync(
+                    "/restconf/data/Cisco-IOS-XE-native:native/ip/name-server",
+                    cancellationToken).ConfigureAwait(false);
+                if (json == null)
+                    return new CiscoDnsInfo();
+                return YangParser.ParseDns(json);
+            }
+            catch
+            {
+                return new CiscoDnsInfo();
+            }
+        }
+
         private static RestConfClient CreateClient(string host, string username, string password, int port)
         {
             return new RestConfClient(host, username, password, port, ignoreCertificateErrors: true);

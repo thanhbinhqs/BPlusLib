@@ -501,6 +501,763 @@ namespace BPlusLib.Foundation.Networking.Cisco
             return false;
         }
 
+        // ─────────────────────────────────────────────────────────────────────
+        // 1. AAA Servers
+        // ─────────────────────────────────────────────────────────────────────
+        /// <summary>
+        /// Parses RADIUS/TACACS+ AAA server configuration.
+        /// </summary>
+        public static List<CiscoAaaServerInfo> ParseAaaServers(JObject? json)
+        {
+            var results = new List<CiscoAaaServerInfo>();
+            try
+            {
+                if (json == null) return results;
+                var servers = json["Cisco-IOS-XE-aaa:aaa"]?["radius"]?["servers"]?["server"];
+                if (servers == null) return results;
+                var arr = servers is JArray ? servers : new JArray(servers);
+                foreach (var item in arr)
+                {
+                    if (item is JObject obj)
+                    {
+                        results.Add(new CiscoAaaServerInfo
+                        {
+                            ServerType = GetString(obj, "server-type"),
+                            IpAddress = GetString(obj, "address"),
+                            Port = GetInt(obj, "auth-port"),
+                            Key = GetString(obj, "key"),
+                            State = GetString(obj, "state"),
+                            Timeout = GetInt(obj, "timeout"),
+                            RetransmitCount = GetInt(obj, "retransmit"),
+                            DeadTime = GetInt(obj, "dead-time"),
+                            IsEnabled = GetBool(obj, "state"),
+                            LastQueried = DateTimeOffset.UtcNow
+                        });
+                    }
+                }
+            }
+            catch { }
+            return results;
+        }
+
+        // ─────────────────────────────────────────────────────────────────────
+        // 2. QoS Profiles
+        // ─────────────────────────────────────────────────────────────────────
+        /// <summary>
+        /// Parses QoS profile configuration.
+        /// </summary>
+        public static List<CiscoQosProfileInfo> ParseQosProfiles(JObject? json)
+        {
+            var results = new List<CiscoQosProfileInfo>();
+            try
+            {
+                if (json == null) return results;
+                var profiles = json["Cisco-IOS-XE-wireless-qos-cfg:qos-cfg"]?["qos-profile"];
+                if (profiles == null) return results;
+                var arr = profiles is JArray ? profiles : new JArray(profiles);
+                foreach (var item in arr)
+                {
+                    if (item is JObject obj)
+                    {
+                        results.Add(new CiscoQosProfileInfo
+                        {
+                            Name = GetString(obj, "profile-name"),
+                            Description = GetString(obj, "description"),
+                            AverageDataRate = GetInt(obj, "avg-data-rate"),
+                            BurstDataRate = GetInt(obj, "burst-data-rate"),
+                            AverageVoiceRate = GetInt(obj, "avg-voice-rate"),
+                            BurstVoiceRate = GetInt(obj, "burst-voice-rate"),
+                            QosDirection = GetString(obj, "direction"),
+                            LastQueried = DateTimeOffset.UtcNow
+                        });
+                    }
+                }
+            }
+            catch { }
+            return results;
+        }
+
+        // ─────────────────────────────────────────────────────────────────────
+        // 3. Rogue APs
+        // ─────────────────────────────────────────────────────────────────────
+        /// <summary>
+        /// Parses rogue access point operational data.
+        /// </summary>
+        public static List<CiscoRogueApInfo> ParseRogueAps(JObject? json)
+        {
+            var results = new List<CiscoRogueApInfo>();
+            try
+            {
+                if (json == null) return results;
+                var rogues = json["Cisco-IOS-XE-wireless-rogue-oper:rogue-oper-data"]?["rogue"];
+                if (rogues == null) return results;
+                var arr = rogues is JArray ? rogues : new JArray(rogues);
+                foreach (var item in arr)
+                {
+                    if (item is JObject obj)
+                    {
+                        results.Add(new CiscoRogueApInfo
+                        {
+                            MacAddress = GetString(obj, "rogue-mac"),
+                            RadioType = GetString(obj, "radio-type"),
+                            Channel = GetInt(obj, "channel"),
+                            Rssi = GetInt(obj, "rssi"),
+                            Classification = GetString(obj, "classification"),
+                            State = GetString(obj, "state"),
+                            Severity = GetString(obj, "severity"),
+                            DetectedBy = GetString(obj, "detected-by"),
+                            ContainmentState = GetString(obj, "containment-state"),
+                            ContainmentLevel = GetInt(obj, "containment-level"),
+                            FirstSeen = GetString(obj, "first-time"),
+                            LastSeen = GetString(obj, "last-time"),
+                            LastQueried = DateTimeOffset.UtcNow
+                        });
+                    }
+                }
+            }
+            catch { }
+            return results;
+        }
+
+        // ─────────────────────────────────────────────────────────────────────
+        // 4. WIPS Alerts
+        // ─────────────────────────────────────────────────────────────────────
+        /// <summary>
+        /// Parses WIPS (Wireless Intrusion Prevention System) alert data.
+        /// </summary>
+        public static List<CiscoWipsAlertInfo> ParseWipsAlerts(JObject? json)
+        {
+            var results = new List<CiscoWipsAlertInfo>();
+            try
+            {
+                if (json == null) return results;
+                var alerts = json["Cisco-IOS-XE-wireless-wips-oper:wips-oper-data"]?["wips-alert"];
+                if (alerts == null) return results;
+                var arr = alerts is JArray ? alerts : new JArray(alerts);
+                foreach (var item in arr)
+                {
+                    if (item is JObject obj)
+                    {
+                        DateTimeOffset ts = DateTimeOffset.MinValue;
+                        var tsToken = obj["timestamp"];
+                        if (tsToken != null && DateTimeOffset.TryParse(tsToken.ToString(), out var parsed))
+                            ts = parsed;
+
+                        results.Add(new CiscoWipsAlertInfo
+                        {
+                            AlertType = GetString(obj, "alert-type"),
+                            Severity = GetString(obj, "severity"),
+                            SourceMac = GetString(obj, "source-mac"),
+                            SourceApName = GetString(obj, "source-ap-name"),
+                            TargetMac = GetString(obj, "target-mac"),
+                            Description = GetString(obj, "description"),
+                            State = GetString(obj, "state"),
+                            Timestamp = ts,
+                            LastQueried = DateTimeOffset.UtcNow
+                        });
+                    }
+                }
+            }
+            catch { }
+            return results;
+        }
+
+        // ─────────────────────────────────────────────────────────────────────
+        // 5. Licenses
+        // ─────────────────────────────────────────────────────────────────────
+        /// <summary>
+        /// Parses license / UDI information.
+        /// </summary>
+        public static List<CiscoLicenseInfo> ParseLicenses(JObject? json)
+        {
+            var results = new List<CiscoLicenseInfo>();
+            try
+            {
+                if (json == null) return results;
+                var licenseSection = json["Cisco-IOS-XE-native:native"]?["license"];
+                if (licenseSection == null) return results;
+
+                // Try to parse feature-based licenses under "feature" array
+                var features = licenseSection["feature"];
+                if (features != null)
+                {
+                    var arr = features is JArray ? features : new JArray(features);
+                    foreach (var item in arr)
+                    {
+                        if (item is JObject obj)
+                        {
+                            results.Add(new CiscoLicenseInfo
+                            {
+                                LicenseType = GetString(obj, "feature-name"),
+                                Description = GetString(obj, "description"),
+                                EntitlementCount = GetInt(obj, "count"),
+                                UsedCount = GetInt(obj, "used"),
+                                AvailableCount = GetInt(obj, "available"),
+                                Status = GetString(obj, "status"),
+                                ExpiryDate = GetString(obj, "expiry"),
+                                IsEnabled = GetBool(obj, "enabled"),
+                                LastQueried = DateTimeOffset.UtcNow
+                            });
+                        }
+                    }
+                }
+
+                // Also parse the UDI section for a single entry if no features found
+                if (results.Count == 0)
+                {
+                    var udi = licenseSection["udi"];
+                    if (udi is JObject udiObj)
+                    {
+                        results.Add(new CiscoLicenseInfo
+                        {
+                            LicenseType = "UDI",
+                            Description = GetString(udiObj, "pid"),
+                            Status = GetString(udiObj, "sn"),
+                            LastQueried = DateTimeOffset.UtcNow
+                        });
+                    }
+                }
+            }
+            catch { }
+            return results;
+        }
+
+        // ─────────────────────────────────────────────────────────────────────
+        // 6. Mobility Peers
+        // ─────────────────────────────────────────────────────────────────────
+        /// <summary>
+        /// Parses mobility peer/anchor configuration.
+        /// </summary>
+        public static List<CiscoMobilityInfo> ParseMobilityPeers(JObject? json)
+        {
+            var results = new List<CiscoMobilityInfo>();
+            try
+            {
+                if (json == null) return results;
+                var peers = json["Cisco-IOS-XE-wireless-mobility:mobility"]?["peer"];
+                if (peers == null) return results;
+                var arr = peers is JArray ? peers : new JArray(peers);
+                foreach (var item in arr)
+                {
+                    if (item is JObject obj)
+                    {
+                        results.Add(new CiscoMobilityInfo
+                        {
+                            PeerIpAddress = GetString(obj, "peer-ip-address"),
+                            PeerName = GetString(obj, "peer-name"),
+                            PeerMacAddress = GetString(obj, "peer-mac-address"),
+                            State = GetString(obj, "state"),
+                            Type = GetString(obj, "type"),
+                            GroupId = GetString(obj, "group-id"),
+                            IsAnchor = GetBool(obj, "anchor"),
+                            TunnelType = GetInt(obj, "tunnel-type"),
+                            LastQueried = DateTimeOffset.UtcNow
+                        });
+                    }
+                }
+            }
+            catch { }
+            return results;
+        }
+
+        // ─────────────────────────────────────────────────────────────────────
+        // 7. ACLs
+        // ─────────────────────────────────────────────────────────────────────
+        /// <summary>
+        /// Parses wireless ACL configuration.
+        /// </summary>
+        public static List<CiscoAclInfo> ParseAcls(JObject? json)
+        {
+            var results = new List<CiscoAclInfo>();
+            try
+            {
+                if (json == null) return results;
+                var acls = json["Cisco-IOS-XE-wireless-acl-cfg:acl-cfg"]?["acl"];
+                if (acls == null) return results;
+                var arr = acls is JArray ? acls : new JArray(acls);
+                foreach (var item in arr)
+                {
+                    if (item is JObject obj)
+                    {
+                        results.Add(new CiscoAclInfo
+                        {
+                            Name = GetString(obj, "acl-name"),
+                            Description = GetString(obj, "description"),
+                            Direction = GetString(obj, "direction"),
+                            RuleCount = GetInt(obj, "rule-count"),
+                            AclType = GetString(obj, "acl-type"),
+                            IsEnabled = GetBool(obj, "enabled"),
+                            LastQueried = DateTimeOffset.UtcNow
+                        });
+                    }
+                }
+            }
+            catch { }
+            return results;
+        }
+
+        // ─────────────────────────────────────────────────────────────────────
+        // 8. Management
+        // ─────────────────────────────────────────────────────────────────────
+        /// <summary>
+        /// Parses management interface configuration (SSH, HTTP, SNMP, Telnet).
+        /// </summary>
+        public static CiscoManagementInfo ParseManagement(JObject? json)
+        {
+            try
+            {
+                if (json == null)
+                    return new CiscoManagementInfo { LastQueried = DateTimeOffset.UtcNow };
+
+                var mgmt = json["Cisco-IOS-XE-native:native"]?["management"];
+                if (mgmt is not JObject mgmtObj)
+                    return new CiscoManagementInfo { LastQueried = DateTimeOffset.UtcNow };
+
+                // SSH
+                var ssh = mgmtObj["ssh"];
+                string sshVersion = ssh != null ? GetString(ssh, "version") : string.Empty;
+                int sshPort = ssh != null ? GetInt(ssh, "port") : 22;
+                bool sshEnabled = ssh != null && GetBool(ssh, "enable");
+
+                // HTTP / HTTPS
+                var http = mgmtObj["http"];
+                bool httpEnabled = http != null && GetBool(http, "secure-server") == false;
+                var https = mgmtObj["https"];
+                bool httpsEnabled = https != null && GetBool(https, "server");
+                int httpsPort = https != null ? GetInt(https, "port") : 443;
+
+                // SNMP
+                var snmp = mgmtObj["snmp-server"];
+                string snmpVersion = snmp != null ? GetString(snmp, "version") : string.Empty;
+                string snmpCommunity = snmp != null ? GetString(snmp, "community") : string.Empty;
+                bool snmpEnabled = snmp != null && !string.IsNullOrEmpty(snmpVersion);
+
+                // Telnet
+                var telnet = mgmtObj["telnet"];
+                string telnetState = telnet != null ? GetString(telnet, "state") : string.Empty;
+
+                // Console timeout
+                var line = mgmtObj["line"] ?? mgmtObj["line-vty"];
+                string consoleTimeout = line != null ? GetString(line, "exec-timeout") : string.Empty;
+
+                return new CiscoManagementInfo
+                {
+                    SshVersion = sshVersion,
+                    SshPort = sshPort,
+                    SshEnabled = sshEnabled,
+                    HttpEnabled = httpEnabled,
+                    HttpsEnabled = httpsEnabled,
+                    HttpsPort = httpsPort,
+                    SnmpVersion = snmpVersion,
+                    SnmpCommunity = snmpCommunity,
+                    SnmpEnabled = snmpEnabled,
+                    TelnetState = telnetState,
+                    ConsoleTimeout = consoleTimeout,
+                    LastQueried = DateTimeOffset.UtcNow
+                };
+            }
+            catch
+            {
+                return new CiscoManagementInfo { LastQueried = DateTimeOffset.UtcNow };
+            }
+        }
+
+        // ─────────────────────────────────────────────────────────────────────
+        // 9. Statistics
+        // ─────────────────────────────────────────────────────────────────────
+        /// <summary>
+        /// Parses radio/WLAN statistics and counters from access-point-oper-data.
+        /// </summary>
+        public static List<CiscoStatisticsInfo> ParseStatistics(JObject? json)
+        {
+            var results = new List<CiscoStatisticsInfo>();
+            try
+            {
+                if (json == null) return results;
+                var apData = json["Cisco-IOS-XE-wireless-access-point-oper:access-point-oper-data"];
+                if (apData == null) return results;
+                var apArray = apData is JArray ? apData : new JArray(apData);
+
+                foreach (var ap in apArray)
+                {
+                    if (ap is not JObject apObj) continue;
+                    string apName = GetString(apObj, "name");
+                    string apMac = GetString(apObj, "mac");
+
+                    var slots = apObj["slot"];
+                    if (slots == null) continue;
+                    var slotArray = slots is JArray ? slots : new JArray(slots);
+
+                    foreach (var slot in slotArray)
+                    {
+                        if (slot is not JObject slotObj) continue;
+                        string band = DetermineBand(slotObj, GetString(slotObj, "radio-type"));
+
+                        results.Add(new CiscoStatisticsInfo
+                        {
+                            ApName = apName,
+                            ApMacAddress = apMac,
+                            SlotId = GetInt(slotObj, "slot-id"),
+                            Band = band,
+                            TotalClients = GetLong(slotObj, "client-count"),
+                            TxBytes = GetLong(slotObj, "tx-bytes"),
+                            RxBytes = GetLong(slotObj, "rx-bytes"),
+                            TxFrames = GetLong(slotObj, "tx-frames"),
+                            RxFrames = GetLong(slotObj, "rx-frames"),
+                            TxErrors = GetLong(slotObj, "tx-errors"),
+                            RxErrors = GetLong(slotObj, "rx-errors"),
+                            TxRetries = GetLong(slotObj, "tx-retries"),
+                            RxRetries = GetLong(slotObj, "rx-retries"),
+                            NoiseFloor = GetInt(slotObj, "noise-floor"),
+                            Utilization = GetDouble(slotObj, "utilization"),
+                            ClientCount = GetInt(slotObj, "client-count"),
+                            LastQueried = DateTimeOffset.UtcNow
+                        });
+                    }
+                }
+            }
+            catch { }
+            return results;
+        }
+
+        // ─────────────────────────────────────────────────────────────────────
+        // 10. FlexConnect
+        // ─────────────────────────────────────────────────────────────────────
+        /// <summary>
+        /// Parses FlexConnect configuration.
+        /// </summary>
+        public static List<CiscoFlexConnectInfo> ParseFlexConnect(JObject? json)
+        {
+            var results = new List<CiscoFlexConnectInfo>();
+            try
+            {
+                if (json == null) return results;
+                var apFlex = json["Cisco-IOS-XE-wireless-flexconnect-cfg:flexconnect-cfg"]?["ap-flex"];
+                if (apFlex == null) return results;
+                var arr = apFlex is JArray ? apFlex : new JArray(apFlex);
+                foreach (var item in arr)
+                {
+                    if (item is JObject obj)
+                    {
+                        results.Add(new CiscoFlexConnectInfo
+                        {
+                            ApName = GetString(obj, "ap-name"),
+                            ApMacAddress = GetString(obj, "ap-mac"),
+                            Mode = GetString(obj, "mode"),
+                            AuthList = GetString(obj, "auth-list"),
+                            Vlan = GetString(obj, "vlan"),
+                            NativeVlan = GetString(obj, "native-vlan"),
+                            JumboFrame = GetString(obj, "jumbo-frame"),
+                            IsConnected = GetBool(obj, "connected"),
+                            LastQueried = DateTimeOffset.UtcNow
+                        });
+                    }
+                }
+            }
+            catch { }
+            return results;
+        }
+
+        // ─────────────────────────────────────────────────────────────────────
+        // 11. AP Authorization
+        // ─────────────────────────────────────────────────────────────────────
+        /// <summary>
+        /// Parses AP authorization list entries.
+        /// </summary>
+        public static List<CiscoApAuthorizationInfo> ParseApAuthorization(JObject? json)
+        {
+            var results = new List<CiscoApAuthorizationInfo>();
+            try
+            {
+                if (json == null) return results;
+                var authList = json["Cisco-IOS-XE-wireless-ap-cfg:ap-cfg"]?["ap-auth-list"]?["ap-auth"];
+                if (authList == null) return results;
+                var arr = authList is JArray ? authList : new JArray(authList);
+                foreach (var item in arr)
+                {
+                    if (item is JObject obj)
+                    {
+                        results.Add(new CiscoApAuthorizationInfo
+                        {
+                            MacAddress = GetString(obj, "ap-mac"),
+                            Name = GetString(obj, "ap-name"),
+                            AuthState = GetString(obj, "auth-state"),
+                            Priority = GetString(obj, "priority"),
+                            Group = GetString(obj, "group"),
+                            IsAuthorized = GetBool(obj, "authorized"),
+                            LastQueried = DateTimeOffset.UtcNow
+                        });
+                    }
+                }
+            }
+            catch { }
+            return results;
+        }
+
+        // ─────────────────────────────────────────────────────────────────────
+        // 12. Clean Air
+        // ─────────────────────────────────────────────────────────────────────
+        /// <summary>
+        /// Parses Clean Air air quality metrics.
+        /// </summary>
+        public static List<CiscoCleanAirInfo> ParseCleanAir(JObject? json)
+        {
+            var results = new List<CiscoCleanAirInfo>();
+            try
+            {
+                if (json == null) return results;
+                var cleanAir = json["Cisco-IOS-XE-wireless-cleanair-oper:cleanair-oper-data"]?["cleanair"];
+                if (cleanAir == null) return results;
+                var arr = cleanAir is JArray ? cleanAir : new JArray(cleanAir);
+                foreach (var item in arr)
+                {
+                    if (item is JObject obj)
+                    {
+                        results.Add(new CiscoCleanAirInfo
+                        {
+                            ApName = GetString(obj, "ap-name"),
+                            ApMacAddress = GetString(obj, "ap-mac"),
+                            SlotId = GetInt(obj, "slot-id"),
+                            Band = GetString(obj, "band"),
+                            AirQuality = GetInt(obj, "air-quality"),
+                            AirQualityStatus = GetInt(obj, "air-quality-status"),
+                            InterferenceDeviceCount = GetInt(obj, "interference-device-count"),
+                            InterferenceType = GetString(obj, "interference-type"),
+                            NonWifiInterference = GetInt(obj, "non-wifi-interference"),
+                            WifiInterference = GetInt(obj, "wifi-interference"),
+                            LastQueried = DateTimeOffset.UtcNow
+                        });
+                    }
+                }
+            }
+            catch { }
+            return results;
+        }
+
+        // ─────────────────────────────────────────────────────────────────────
+        // 13. Wired Clients
+        // ─────────────────────────────────────────────────────────────────────
+        /// <summary>
+        /// Parses wired clients connected to AP Ethernet ports.
+        /// </summary>
+        public static List<CiscoWiredClientInfo> ParseWiredClients(JObject? json)
+        {
+            var results = new List<CiscoWiredClientInfo>();
+            try
+            {
+                if (json == null) return results;
+                var wiredClients = json["Cisco-IOS-XE-wireless-wired-client-oper:wired-client-oper-data"]?["wired-client"];
+                if (wiredClients == null) return results;
+                var arr = wiredClients is JArray ? wiredClients : new JArray(wiredClients);
+                foreach (var item in arr)
+                {
+                    if (item is JObject obj)
+                    {
+                        results.Add(new CiscoWiredClientInfo
+                        {
+                            MacAddress = GetString(obj, "mac-address"),
+                            IpAddress = GetString(obj, "ip-address"),
+                            ApName = GetString(obj, "ap-name"),
+                            ApMacAddress = GetString(obj, "ap-mac"),
+                            Interface = GetString(obj, "interface"),
+                            Vlan = GetString(obj, "vlan"),
+                            Status = GetString(obj, "status"),
+                            TxBytes = GetLong(obj, "tx-bytes"),
+                            RxBytes = GetLong(obj, "rx-bytes"),
+                            LastQueried = DateTimeOffset.UtcNow
+                        });
+                    }
+                }
+            }
+            catch { }
+            return results;
+        }
+
+        // ─────────────────────────────────────────────────────────────────────
+        // 14. Mesh Info
+        // ─────────────────────────────────────────────────────────────────────
+        /// <summary>
+        /// Parses mesh networking configuration.
+        /// </summary>
+        public static List<CiscoMeshInfo> ParseMeshInfo(JObject? json)
+        {
+            var results = new List<CiscoMeshInfo>();
+            try
+            {
+                if (json == null) return results;
+                var mesh = json["Cisco-IOS-XE-wireless-mesh-cfg:mesh-cfg"]?["mesh"];
+                if (mesh == null) return results;
+                var arr = mesh is JArray ? mesh : new JArray(mesh);
+                foreach (var item in arr)
+                {
+                    if (item is JObject obj)
+                    {
+                        results.Add(new CiscoMeshInfo
+                        {
+                            ApName = GetString(obj, "ap-name"),
+                            ApMacAddress = GetString(obj, "ap-mac"),
+                            Role = GetString(obj, "role"),
+                            BridgeGroupId = GetString(obj, "bridge-group-id"),
+                            HopCount = GetString(obj, "hop-count"),
+                            Backhaul = GetString(obj, "backhaul"),
+                            Parent = GetString(obj, "parent"),
+                            IsMeshEnabled = GetBool(obj, "mesh-enabled"),
+                            LastQueried = DateTimeOffset.UtcNow
+                        });
+                    }
+                }
+            }
+            catch { }
+            return results;
+        }
+
+        // ─────────────────────────────────────────────────────────────────────
+        // 15. NTP
+        // ─────────────────────────────────────────────────────────────────────
+        /// <summary>
+        /// Parses NTP and time configuration.
+        /// </summary>
+        public static CiscoNtpInfo ParseNtp(JObject? json)
+        {
+            try
+            {
+                if (json == null)
+                    return new CiscoNtpInfo { LastQueried = DateTimeOffset.UtcNow };
+
+                var clock = json["Cisco-IOS-XE-native:native"]?["clock"];
+                if (clock is not JObject clockObj)
+                    return new CiscoNtpInfo { LastQueried = DateTimeOffset.UtcNow };
+
+                // Parse NTP servers (may be under "ntp" child)
+                var ntp = clockObj["ntp"];
+                string server1 = string.Empty, server2 = string.Empty, server3 = string.Empty;
+                bool ntpEnabled = false;
+
+                if (ntp is JObject ntpObj)
+                {
+                    ntpEnabled = GetBool(ntpObj, "enable");
+                    var servers = ntpObj["server"];
+                    if (servers is JArray srvArray)
+                    {
+                        for (int i = 0; i < Math.Min(srvArray.Count, 3); i++)
+                        {
+                            string addr = GetString(srvArray[i], "address");
+                            if (string.IsNullOrEmpty(addr)) addr = srvArray[i]?.ToString() ?? string.Empty;
+                            switch (i)
+                            {
+                                case 0: server1 = addr; break;
+                                case 1: server2 = addr; break;
+                                case 2: server3 = addr; break;
+                            }
+                        }
+                    }
+                    else if (servers is JObject srvObj)
+                    {
+                        server1 = GetString(srvObj, "address");
+                    }
+                }
+
+                // Timezone
+                var timezone = clockObj["timezone"];
+                string tz = timezone != null ? GetString(timezone, "name") : string.Empty;
+                string tzOffset = timezone != null ? GetString(timezone, "offset") : string.Empty;
+
+                // Daylight saving
+                var dst = clockObj["daylight-saving-time"];
+                string dstStr = dst != null ? GetString(dst, "enable") : string.Empty;
+
+                // System time
+                string sysTime = GetString(clockObj, "datetime");
+
+                return new CiscoNtpInfo
+                {
+                    NtpServer1 = server1,
+                    NtpServer2 = server2,
+                    NtpServer3 = server3,
+                    NtpEnabled = ntpEnabled,
+                    TimeZone = tz,
+                    TimeZoneOffset = tzOffset,
+                    DaylightSaving = dstStr,
+                    SystemTime = sysTime,
+                    LastQueried = DateTimeOffset.UtcNow
+                };
+            }
+            catch
+            {
+                return new CiscoNtpInfo { LastQueried = DateTimeOffset.UtcNow };
+            }
+        }
+
+        // ─────────────────────────────────────────────────────────────────────
+        // 16. DNS
+        // ─────────────────────────────────────────────────────────────────────
+        /// <summary>
+        /// Parses DNS configuration.
+        /// </summary>
+        public static CiscoDnsInfo ParseDns(JObject? json)
+        {
+            try
+            {
+                if (json == null)
+                    return new CiscoDnsInfo { LastQueried = DateTimeOffset.UtcNow };
+
+                var ip = json["Cisco-IOS-XE-native:native"]?["ip"];
+                if (ip is not JObject ipObj)
+                    return new CiscoDnsInfo { LastQueried = DateTimeOffset.UtcNow };
+
+                string domainName = GetString(ipObj, "domain-name");
+                var nameServers = ipObj["name-server"];
+                string ns1 = string.Empty, ns2 = string.Empty, ns3 = string.Empty;
+
+                if (nameServers is JArray nsArray)
+                {
+                    for (int i = 0; i < Math.Min(nsArray.Count, 3); i++)
+                    {
+                        string addr = nsArray[i]?.ToString() ?? string.Empty;
+                        switch (i)
+                        {
+                            case 0: ns1 = addr; break;
+                            case 1: ns2 = addr; break;
+                            case 2: ns3 = addr; break;
+                        }
+                    }
+                }
+                else if (nameServers is JObject nsObj)
+                {
+                    ns1 = GetString(nsObj, "address");
+                }
+
+                return new CiscoDnsInfo
+                {
+                    DomainName = domainName,
+                    NameServer1 = ns1,
+                    NameServer2 = ns2,
+                    NameServer3 = ns3,
+                    DnsEnabled = !string.IsNullOrEmpty(domainName) || !string.IsNullOrEmpty(ns1),
+                    LastQueried = DateTimeOffset.UtcNow
+                };
+            }
+            catch
+            {
+                return new CiscoDnsInfo { LastQueried = DateTimeOffset.UtcNow };
+            }
+        }
+
+        // ─────────────────────────────────────────────────────────────────────
+        // Additional helper: GetLong
+        // ─────────────────────────────────────────────────────────────────────
+        private static long GetLong(JToken element, string propertyName)
+        {
+            try
+            {
+                var token = element[propertyName];
+                if (token is JValue jv && jv.Value != null)
+                    return Convert.ToInt64(jv.Value);
+            }
+            catch { }
+            return 0L;
+        }
+
         #endregion
     }
 }
