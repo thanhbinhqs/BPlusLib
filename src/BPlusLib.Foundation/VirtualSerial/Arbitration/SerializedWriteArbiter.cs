@@ -22,7 +22,7 @@ namespace BPlusLib.Foundation.VirtualSerial.Arbitration
         public ValueTask ReleaseAsync(WriteToken token, CancellationToken cancellationToken = default)
         {
             _semaphore.Release();
-            return ValueTask.CompletedTask;
+            return default;
         }
 
         private async Task<WriteToken> WaitAndCreateTokenAsync(Guid sessionId, CancellationToken ct)

@@ -76,7 +76,7 @@ namespace BPlusLib.Foundation.VirtualSerial.Routing
         {
             if (_cts != null)
             {
-                await _cts.CancelAsync().ConfigureAwait(false);
+                _cts.Cancel();
 
                 foreach (var task in _pumpTasks)
                 {

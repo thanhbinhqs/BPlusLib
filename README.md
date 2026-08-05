@@ -1,6 +1,6 @@
 # BPlusLib.Foundation
 
-**Enterprise-grade Windows Foundation Library — 31 modules, 1,286 tests, pure P/Invoke.**
+**Enterprise-grade Windows Foundation Library — 32 modules, 1,309 tests, pure P/Invoke.**
 
 ---
 
@@ -11,9 +11,9 @@ BPlusLib.Foundation is a production-ready C# utility library for Windows desktop
 | | |
 |---|---|
 | **Targets** | net472 · net6.0 · net8.0 |
-| **Version** | 2.10.1 |
+**Version** | 2.12.0
 | **License** | MIT |
-| **Tests** | 1,286 (1,194 passing, 92 skipped — Windows-only) |
+| **Tests** | 1,309 (1,217 passing, 92 skipped — Windows-only) |
 | **Author** | [thanhbinhqs](https://github.com/thanhbinhqs) |
 
 ---

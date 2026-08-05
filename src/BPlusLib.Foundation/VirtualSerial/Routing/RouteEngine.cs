@@ -27,7 +27,7 @@ namespace BPlusLib.Foundation.VirtualSerial.Routing
 
         public void AddEndpoint(ISerialEndpoint endpoint)
         {
-            ArgumentNullException.ThrowIfNull(endpoint);
+            if (endpoint == null) throw new ArgumentNullException(nameof(endpoint));
             _endpoints[endpoint.Id] = endpoint;
         }
 
@@ -49,7 +49,7 @@ namespace BPlusLib.Foundation.VirtualSerial.Routing
 
         public void AddRoute(SerialRoute route)
         {
-            ArgumentNullException.ThrowIfNull(route);
+            if (route == null) throw new ArgumentNullException(nameof(route));
             _routes[route.Id] = route;
             _statistics[route.Id] = new RouteStatistics();
         }

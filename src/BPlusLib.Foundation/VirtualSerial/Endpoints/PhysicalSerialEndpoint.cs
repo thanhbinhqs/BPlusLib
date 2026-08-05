@@ -42,7 +42,7 @@ namespace BPlusLib.Foundation.VirtualSerial.Endpoints
 
         public ValueTask StartAsync(CancellationToken cancellationToken = default)
         {
-            if (_isRunning) return ValueTask.CompletedTask;
+            if (_isRunning) return default;
 
             _cts = new CancellationTokenSource();
             _channel = Channel.CreateUnbounded<SerialFrame>(new UnboundedChannelOptions
@@ -89,7 +89,7 @@ namespace BPlusLib.Foundation.VirtualSerial.Endpoints
 
             _readTask = Task.Run(() => ReadLoopAsync(_cts.Token), _cts.Token);
 
-            return ValueTask.CompletedTask;
+            return default;
         }
 
         public async ValueTask StopAsync(CancellationToken cancellationToken = default)
@@ -118,7 +118,7 @@ namespace BPlusLib.Foundation.VirtualSerial.Endpoints
                 throw new InvalidOperationException("Endpoint is not running.");
             byte[] bytes = data.ToArray();
             _port.Write(bytes, 0, bytes.Length);
-            return ValueTask.CompletedTask;
+            return default;
         }
 
         public IAsyncEnumerable<SerialFrame> ReadAllAsync(CancellationToken cancellationToken = default)
@@ -131,17 +131,17 @@ namespace BPlusLib.Foundation.VirtualSerial.Endpoints
 
         public ValueTask PurgeAsync(PurgeFlags flags = PurgeFlags.All, CancellationToken cancellationToken = default)
         {
-            if (_port?.IsOpen != true) return ValueTask.CompletedTask;
+            if (_port?.IsOpen != true) return default;
 
             if (flags.HasFlag(PurgeFlags.RxClear)) _port.DiscardInBuffer();
             if (flags.HasFlag(PurgeFlags.TxClear)) _port.DiscardOutBuffer();
 
-            return ValueTask.CompletedTask;
+            return default;
         }
 
         public ValueTask SetModemControlAsync(bool? dtr = null, bool? rts = null, CancellationToken cancellationToken = default)
         {
-            if (_port?.IsOpen != true) return ValueTask.CompletedTask;
+            if (_port?.IsOpen != true) return default;
 
             if (dtr.HasValue) _port.DtrEnable = dtr.Value;
             if (rts.HasValue) _port.RtsEnable = rts.Value;
@@ -151,17 +151,17 @@ namespace BPlusLib.Foundation.VirtualSerial.Endpoints
             _modemSignals.NotifyChanged(previous);
             ModemSignalsChanged?.Invoke(this, new ModemSignalChangedEventArgs(previous, _modemSignals));
 
-            return ValueTask.CompletedTask;
+            return default;
         }
 
         public ValueTask SetBreakAsync(bool on, CancellationToken cancellationToken = default)
         {
-            if (_port?.IsOpen != true) return ValueTask.CompletedTask;
+            if (_port?.IsOpen != true) return default;
 
             if (on) _port.BreakState = true;
             else _port.BreakState = false;
 
-            return ValueTask.CompletedTask;
+            return default;
         }
 
         private async Task ReadLoopAsync(CancellationToken ct)

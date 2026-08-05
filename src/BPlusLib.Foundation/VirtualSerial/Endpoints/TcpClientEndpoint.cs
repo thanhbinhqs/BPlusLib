@@ -48,7 +48,7 @@ namespace BPlusLib.Foundation.VirtualSerial.Endpoints
 
         public ValueTask StartAsync(CancellationToken cancellationToken = default)
         {
-            if (_isRunning) return ValueTask.CompletedTask;
+            if (_isRunning) return default;
 
             _cts = new CancellationTokenSource();
             _channel = Channel.CreateUnbounded<SerialFrame>(new UnboundedChannelOptions
@@ -60,7 +60,7 @@ namespace BPlusLib.Foundation.VirtualSerial.Endpoints
             _isRunning = true;
             _readTask = Task.Run(() => ConnectAndReadLoopAsync(_cts.Token), _cts.Token);
 
-            return ValueTask.CompletedTask;
+            return default;
         }
 
         public async ValueTask StopAsync(CancellationToken cancellationToken = default)
@@ -100,17 +100,17 @@ namespace BPlusLib.Foundation.VirtualSerial.Endpoints
 
         public ValueTask PurgeAsync(PurgeFlags flags = PurgeFlags.All, CancellationToken cancellationToken = default)
         {
-            return ValueTask.CompletedTask;
+            return default;
         }
 
         public ValueTask SetModemControlAsync(bool? dtr = null, bool? rts = null, CancellationToken cancellationToken = default)
         {
-            return ValueTask.CompletedTask;
+            return default;
         }
 
         public ValueTask SetBreakAsync(bool on, CancellationToken cancellationToken = default)
         {
-            return ValueTask.CompletedTask;
+            return default;
         }
 
         private async Task ConnectAndReadLoopAsync(CancellationToken ct)

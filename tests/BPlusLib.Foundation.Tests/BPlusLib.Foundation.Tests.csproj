@@ -15,6 +15,11 @@
     <DefineConstants>$(DefineConstants);FEATURE_WINDOW_MODULE</DefineConstants>
   </PropertyGroup>
 
+  <!-- VirtualSerial: net6.0+ only -->
+  <ItemGroup Condition="'$(TargetFramework)' == 'net472'">
+    <Compile Remove="VirtualSerial\**" />
+  </ItemGroup>
+
   <ItemGroup>
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.10.0" />
     <PackageReference Include="xunit" Version="2.8.0" />

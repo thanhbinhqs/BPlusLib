@@ -57,7 +57,7 @@ namespace BPlusLib.Foundation.VirtualSerial.Arbitration
                 TransactionReleased?.Invoke(this, token.SessionId);
             }
 
-            return ValueTask.CompletedTask;
+            return default;
         }
 
         /// <summary>

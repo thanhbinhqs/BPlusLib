@@ -35,13 +35,13 @@ namespace BPlusLib.Foundation.VirtualSerial.Endpoints
         public ValueTask StartAsync(CancellationToken cancellationToken = default)
         {
             _isRunning = true;
-            return ValueTask.CompletedTask;
+            return default;
         }
 
         public ValueTask StopAsync(CancellationToken cancellationToken = default)
         {
             _isRunning = false;
-            return ValueTask.CompletedTask;
+            return default;
         }
 
         public ValueTask SendAsync(ReadOnlyMemory<byte> data, CancellationToken cancellationToken = default)
@@ -59,23 +59,23 @@ namespace BPlusLib.Foundation.VirtualSerial.Endpoints
 
         public ValueTask PurgeAsync(PurgeFlags flags = PurgeFlags.All, CancellationToken cancellationToken = default)
         {
-            return ValueTask.CompletedTask;
+            return default;
         }
 
         public ValueTask SetModemControlAsync(bool? dtr = null, bool? rts = null, CancellationToken cancellationToken = default)
         {
-            return ValueTask.CompletedTask;
+            return default;
         }
 
         public ValueTask SetBreakAsync(bool on, CancellationToken cancellationToken = default)
         {
-            return ValueTask.CompletedTask;
+            return default;
         }
 
         public ValueTask DisposeAsync()
         {
             _isRunning = false;
-            return ValueTask.CompletedTask;
+            return default;
         }
     }
 }

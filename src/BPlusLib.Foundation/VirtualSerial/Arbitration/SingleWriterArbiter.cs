@@ -40,7 +40,7 @@ namespace BPlusLib.Foundation.VirtualSerial.Arbitration
         public ValueTask ReleaseAsync(WriteToken token, CancellationToken cancellationToken = default)
         {
             Interlocked.Exchange(ref _currentWriterId, 0);
-            return ValueTask.CompletedTask;
+            return default;
         }
     }
 }
