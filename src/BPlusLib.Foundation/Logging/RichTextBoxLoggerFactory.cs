@@ -6,6 +6,7 @@ namespace BPlusLib.Foundation.Logging
 {
     /// <summary>
     /// Factory for creating NLogLogger instances with optional RichTextBox display.
+    /// Supports both WinForms and WPF cross-thread logging.
     /// </summary>
     public static class RichTextBoxLoggerFactory
     {
@@ -14,20 +15,20 @@ namespace BPlusLib.Foundation.Logging
         /// </summary>
         public static NLogLogger CreateFileOnly(
             string logFilePath = "./logs/app.log",
-            NLog.LogLevel minLevel = null)
+            NLog.LogLevel? minLevel = null)
         {
             return new NLogLogger(logFilePath, minLevel ?? NLog.LogLevel.Debug);
         }
 
 #if FEATURE_WINDOW_MODULE
         /// <summary>
-        /// Creates an NLogLogger that writes to both a file and a RichTextBox.
-        /// Must be called on the UI thread.
+        /// Creates an NLogLogger that writes to both a file and a WinForms RichTextBox.
+        /// Can be called from any thread — the target handles cross-thread marshaling.
         /// </summary>
         public static NLogLogger CreateWithRichTextBox(
             System.Windows.Forms.RichTextBox textBox,
             string logFilePath = "./logs/app.log",
-            NLog.LogLevel minLevel = null)
+            NLog.LogLevel? minLevel = null)
         {
             var level = minLevel ?? NLog.LogLevel.Debug;
             var config = new LoggingConfiguration();
@@ -49,11 +50,34 @@ namespace BPlusLib.Foundation.Logging
 
             config.AddTarget(fileTarget);
             config.AddTarget(rtbTarget);
-            config.AddRule(level, NLog.LogLevel.Error, "file");
-            config.AddRule(level, NLog.LogLevel.Error, "RichTextBox");
+            config.AddRule(level, NLog.LogLevel.Fatal, "file");
+            config.AddRule(level, NLog.LogLevel.Fatal, "RichTextBox");
 
             LogManager.Configuration = config;
             return new NLogLogger(logFilePath, level);
+        }
+
+        /// <summary>
+        /// Creates an NLogLogger that writes to a WinForms RichTextBox only (no file).
+        /// Can be called from any thread — the target handles cross-thread marshaling.
+        /// </summary>
+        public static NLogLogger CreateRichTextBoxOnly(
+            System.Windows.Forms.RichTextBox textBox,
+            NLog.LogLevel? minLevel = null)
+        {
+            var level = minLevel ?? NLog.LogLevel.Debug;
+            var config = new LoggingConfiguration();
+
+            var rtbTarget = new RichTextBoxLogTarget(textBox)
+            {
+                Layout = "${longdate:format=dd/MM/yyyy HH:mm:ss.fff}|${level:uppercase=true}|${message}"
+            };
+
+            config.AddTarget(rtbTarget);
+            config.AddRule(level, NLog.LogLevel.Fatal, "RichTextBox");
+
+            LogManager.Configuration = config;
+            return new NLogLogger("richtextbox", level);
         }
 #endif
     }
