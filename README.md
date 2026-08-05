@@ -91,6 +91,7 @@ using var syslog = CiscoEwcHelper.StartSyslogListener(514, entry => Console.Writ
 | 11 | 🔒 [Security](#-security) | `UacHelper`, `CredentialHelper`, `WinTrustHelper`, `TokenHelper`, `PrivilegeHelper`, `IntegrityHelper`, `SecurityHelper` | [→ docs](docs/modules/security.md) |
 | 12 | 📊 [Diagnostics](#️-diagnostics) | `EventLogReader`, `CrashDumpHelper` | [→ docs](docs/modules/diagnostics.md) |
 | 13 | 📝 [Logging](#️-logging) | `FileLogger`, `LoggerFactory`, `LogEntry`, `NLogLogger`, `RichTextBoxLogTarget` | [→ docs](docs/modules/logging.md) |
+| 14 | 🔌 [VirtualSerial](#-virtualserial) | `ISerialEndpoint`, `RouteEngine`, `FrameDecoders`, `WriteArbitration`, `ModemMapper` | [→ docs](docs/modules/virtualserial.md) |
 | 14 | 🧩 [Extensions](#-extensions) | `StringExtensions`, `StreamExtensions`, `TaskExtensions`, `CollectionExtensions` | [→ docs](docs/modules/extensions.md) |
 | 15 | 📋 [Clipboard](#-clipboard) | `ClipboardHelper` — text, files, bitmap | [→ docs](docs/modules/clipboard.md) |
 | 16 | 📂 [Explorer](#-explorer) | `ExplorerHelper` — known folders, shortcuts, recycle bin | [→ docs](docs/modules/explorer.md) |
