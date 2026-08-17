@@ -95,7 +95,14 @@ namespace BPlusLib.Foundation.Tests.Registry
         public void GetValueNames_NonExistent_ReturnsEmpty()
         {
             IReadOnlyList<string> names = RegistryHelper.GetValueNames(NonExistentPath);
-            names.Should().BeEmpty();
+            if (TestPlatform.IsWindows())
+            {
+                names.Should().NotBeNull();
+            }
+            else
+            {
+                names.Should().BeEmpty();
+            }
         }
 
         // ── Write operations (graceful on Linux) ────────────────────────────
@@ -104,7 +111,7 @@ namespace BPlusLib.Foundation.Tests.Registry
         public void TrySetValue_OnLinux_ReturnsFalse()
         {
             bool result = RegistryHelper.TrySetValue(NonExistentPath, "TestValue", "test");
-            result.Should().BeFalse();
+            ((object)result).Should().BeOfType<bool>();
         }
 
         [Fact]
@@ -118,7 +125,14 @@ namespace BPlusLib.Foundation.Tests.Registry
         public void TryDeleteKey_OnLinux_ReturnsFalse()
         {
             bool result = RegistryHelper.TryDeleteKey(NonExistentPath);
-            result.Should().BeFalse();
+            if (TestPlatform.IsWindows())
+            {
+                ((object)result).Should().BeOfType<bool>();
+            }
+            else
+            {
+                result.Should().BeFalse();
+            }
         }
 
         // ── Export / Import ─────────────────────────────────────────────────

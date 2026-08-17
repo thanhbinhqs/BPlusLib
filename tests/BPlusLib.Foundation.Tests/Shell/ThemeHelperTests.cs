@@ -17,7 +17,7 @@ namespace BPlusLib.Foundation.Tests.Shell
         [SkippableFact]
         public void IsLightTheme_DoesNotThrow()
         {
-            Skip.IfNot(OperatingSystem.IsWindows());
+            Skip.IfNot(TestPlatform.IsWindows());
 
             bool result = ThemeHelper.IsLightTheme();
         }
@@ -27,7 +27,7 @@ namespace BPlusLib.Foundation.Tests.Shell
         [SkippableFact]
         public void IsAppsLightTheme_DoesNotThrow()
         {
-            Skip.IfNot(OperatingSystem.IsWindows());
+            Skip.IfNot(TestPlatform.IsWindows());
 
             bool result = ThemeHelper.IsAppsLightTheme();
         }
@@ -37,7 +37,7 @@ namespace BPlusLib.Foundation.Tests.Shell
         [SkippableFact]
         public void IsSystemLightTheme_DoesNotThrow()
         {
-            Skip.IfNot(OperatingSystem.IsWindows());
+            Skip.IfNot(TestPlatform.IsWindows());
 
             bool result = ThemeHelper.IsSystemLightTheme();
         }
@@ -47,7 +47,7 @@ namespace BPlusLib.Foundation.Tests.Shell
         [SkippableFact]
         public void GetAccentColor_DoesNotThrow()
         {
-            Skip.IfNot(OperatingSystem.IsWindows());
+            Skip.IfNot(TestPlatform.IsWindows());
 
             uint color = ThemeHelper.GetAccentColor();
         }
@@ -57,7 +57,7 @@ namespace BPlusLib.Foundation.Tests.Shell
         [SkippableFact]
         public void IsCompositionEnabled_DoesNotThrow()
         {
-            Skip.IfNot(OperatingSystem.IsWindows());
+            Skip.IfNot(TestPlatform.IsWindows());
 
             bool result = ThemeHelper.IsCompositionEnabled();
         }

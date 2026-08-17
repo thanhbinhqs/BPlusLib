@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Runtime.InteropServices;
+using System.ServiceProcess;
 using System.Threading;
 using BPlusLib.Foundation.Native;
 
@@ -75,6 +76,18 @@ namespace BPlusLib.Foundation.Services
             AdvApi32.SERVICE_CONTINUE_PENDING => ServiceState.ContinuePending,
             AdvApi32.SERVICE_PAUSE_PENDING => ServiceState.PausePending,
             AdvApi32.SERVICE_PAUSED => ServiceState.Paused,
+            _ => ServiceState.Unknown,
+        };
+
+        private static ServiceState ManagedToServiceState(ServiceControllerStatus status) => status switch
+        {
+            ServiceControllerStatus.Stopped => ServiceState.Stopped,
+            ServiceControllerStatus.StartPending => ServiceState.StartPending,
+            ServiceControllerStatus.StopPending => ServiceState.StopPending,
+            ServiceControllerStatus.Running => ServiceState.Running,
+            ServiceControllerStatus.ContinuePending => ServiceState.ContinuePending,
+            ServiceControllerStatus.PausePending => ServiceState.PausePending,
+            ServiceControllerStatus.Paused => ServiceState.Paused,
             _ => ServiceState.Unknown,
         };
 
@@ -901,6 +914,34 @@ namespace BPlusLib.Foundation.Services
         {
             var results = new List<ServiceInfo>();
 
+            try
+            {
+                foreach (ServiceController service in ServiceController.GetServices())
+                {
+                    ServiceState state = ManagedToServiceState(service.Status);
+                    if (stateFilter != ServiceState.Unknown && state != stateFilter)
+                    {
+                        continue;
+                    }
+
+                    results.Add(new ServiceInfo
+                    {
+                        ServiceName = service.ServiceName,
+                        DisplayName = service.DisplayName,
+                        State = state,
+                    });
+                }
+
+                if (results.Count > 0)
+                {
+                    return results;
+                }
+            }
+            catch
+            {
+                // Fall back to the P/Invoke enumerator below.
+            }
+
             SyncLock.Wait();
             try
             {
@@ -912,17 +953,10 @@ namespace BPlusLib.Foundation.Services
 
                 try
                 {
-                    uint nativeStateFilter = stateFilter switch
-                    {
-                        ServiceState.Stopped => AdvApi32.SERVICE_STOPPED,
-                        ServiceState.StartPending => AdvApi32.SERVICE_START_PENDING,
-                        ServiceState.StopPending => AdvApi32.SERVICE_STOP_PENDING,
-                        ServiceState.Running => AdvApi32.SERVICE_RUNNING,
-                        ServiceState.ContinuePending => AdvApi32.SERVICE_CONTINUE_PENDING,
-                        ServiceState.PausePending => AdvApi32.SERVICE_PAUSE_PENDING,
-                        ServiceState.Paused => AdvApi32.SERVICE_PAUSED,
-                        _ => AdvApi32.SERVICE_STATE_ALL,
-                    };
+                    // EnumServicesStatusEx expects SERVICE_ACTIVE / SERVICE_INACTIVE /
+                    // SERVICE_STATE_ALL rather than a single SERVICE_* current-state value.
+                    // Enumerate broadly, then filter managed results by the requested state.
+                    const uint nativeStateFilter = AdvApi32.SERVICE_STATE_ALL;
 
                     uint resumeHandle = 0;
                     const uint initialBufferSize = 16384; // 16 KB initial buffer
@@ -973,7 +1007,12 @@ namespace BPlusLib.Foundation.Services
                                     };
 
                                     info.DisplayName ??= info.ServiceName;
-                                    results.Add(info);
+
+                                    if (stateFilter == ServiceState.Unknown || info.State == stateFilter)
+                                    {
+                                        results.Add(info);
+                                    }
+
                                     current = IntPtr.Add(current, structSize);
                                 }
 

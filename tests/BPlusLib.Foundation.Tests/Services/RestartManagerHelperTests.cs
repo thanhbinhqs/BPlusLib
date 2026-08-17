@@ -4,6 +4,7 @@
 // </copyright>
 
 using System;
+using System.ComponentModel;
 using System.Runtime.InteropServices;
 using BPlusLib.Foundation.Services;
 using FluentAssertions;
@@ -18,15 +19,28 @@ namespace BPlusLib.Foundation.Tests.Services
     [Trait("Category", "Services")]
     public sealed class RestartManagerHelperTests
     {
+        private static RestartManagerSession CreateSessionOrSkip()
+        {
+            try
+            {
+                return new RestartManagerSession();
+            }
+            catch (Win32Exception ex)
+            {
+                Skip.If(true, $"Restart Manager unavailable on this machine: {ex.Message}");
+                throw;
+            }
+        }
+
         /// <summary>
         /// Verifies that a new RestartManager session can be created and disposed.
         /// </summary>
         [SkippableFact]
         public void CreateSession_Dispose_Succeeds()
         {
-            Skip.IfNot(OperatingSystem.IsWindows());
+            Skip.IfNot(TestPlatform.IsWindows());
 
-            var session = new RestartManagerSession();
+            var session = CreateSessionOrSkip();
             var disposeException = Record.Exception(() => session.Dispose());
             disposeException.Should().BeNull();
         }
@@ -37,9 +51,9 @@ namespace BPlusLib.Foundation.Tests.Services
         [SkippableFact]
         public void Dispose_MultipleCalls_Safe()
         {
-            Skip.IfNot(OperatingSystem.IsWindows());
+            Skip.IfNot(TestPlatform.IsWindows());
 
-            var session = new RestartManagerSession();
+            var session = CreateSessionOrSkip();
             session.Dispose();
             var secondDispose = Record.Exception(() => session.Dispose());
             secondDispose.Should().BeNull();
@@ -51,9 +65,9 @@ namespace BPlusLib.Foundation.Tests.Services
         [SkippableFact]
         public void GetProcesses_Disposed_ThrowsObjectDisposed()
         {
-            Skip.IfNot(OperatingSystem.IsWindows());
+            Skip.IfNot(TestPlatform.IsWindows());
 
-            var session = new RestartManagerSession();
+            var session = CreateSessionOrSkip();
             session.Dispose();
 
             Action act = () => session.GetProcesses();
@@ -66,9 +80,9 @@ namespace BPlusLib.Foundation.Tests.Services
         [SkippableFact]
         public void RegisterFiles_NonExistent_DoesNotThrow()
         {
-            Skip.IfNot(OperatingSystem.IsWindows());
+            Skip.IfNot(TestPlatform.IsWindows());
 
-            using var session = new RestartManagerSession();
+            using var session = CreateSessionOrSkip();
             string nonExistentFile = @"C:\DoesNotExist_" + Guid.NewGuid().ToString("N") + ".tmp";
 
             // Registering a non-existent file should not throw; it just registers the path

@@ -16,7 +16,7 @@ namespace BPlusLib.Foundation.Tests.Services
         [SkippableFact]
         public void GetWindowHandle_DoesNotThrow()
         {
-            Skip.IfNot(OperatingSystem.IsWindows());
+            Skip.IfNot(TestPlatform.IsWindows());
             var hwnd = ConsoleHelper.GetWindowHandle();
             // May be zero if no console attached (e.g., test runner)
             // Just verify no exception
@@ -25,7 +25,7 @@ namespace BPlusLib.Foundation.Tests.Services
         [SkippableFact]
         public void HasConsole_ReturnsBool()
         {
-            Skip.IfNot(OperatingSystem.IsWindows());
+            Skip.IfNot(TestPlatform.IsWindows());
             var has = ConsoleHelper.HasConsole;
             // Just verify it's a bool without exception
             has.GetType().Should().Be(typeof(bool));
@@ -34,7 +34,7 @@ namespace BPlusLib.Foundation.Tests.Services
         [SkippableFact]
         public void SetAndGetTitle_Roundtrips()
         {
-            Skip.IfNot(OperatingSystem.IsWindows());
+            Skip.IfNot(TestPlatform.IsWindows());
             if (!ConsoleHelper.HasConsole) return;
             var original = ConsoleHelper.GetTitle();
             ConsoleHelper.SetTitle("BPlusLibTestTitle").Should().BeTrue();
@@ -48,7 +48,7 @@ namespace BPlusLib.Foundation.Tests.Services
         [SkippableFact]
         public void GetTitle_DoesNotThrow()
         {
-            Skip.IfNot(OperatingSystem.IsWindows());
+            Skip.IfNot(TestPlatform.IsWindows());
             var title = ConsoleHelper.GetTitle();
             // May be null if no console — no exception expected
         }
@@ -56,7 +56,7 @@ namespace BPlusLib.Foundation.Tests.Services
         [SkippableFact]
         public void EnableQuickEdit_DoesNotThrow()
         {
-            Skip.IfNot(OperatingSystem.IsWindows());
+            Skip.IfNot(TestPlatform.IsWindows());
             if (!ConsoleHelper.HasConsole) return;
             var result = ConsoleHelper.EnableQuickEdit(false);
             result.GetType().Should().Be(typeof(bool));
@@ -67,7 +67,7 @@ namespace BPlusLib.Foundation.Tests.Services
         [SkippableFact]
         public void SetTextColor_DoesNotThrow()
         {
-            Skip.IfNot(OperatingSystem.IsWindows());
+            Skip.IfNot(TestPlatform.IsWindows());
             if (!ConsoleHelper.HasConsole) return;
             ConsoleHelper.SetTextColor(ConsoleHelper.ConsoleColor.Green).Should().BeTrue();
         }

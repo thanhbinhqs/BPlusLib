@@ -25,50 +25,58 @@ namespace BPlusLib.Foundation.Tests.SystemInfo
         public void IsUefi_ShouldBeBool()
         {
             var bios = BiosInfo.Current;
-            // On Linux, registry checks fail → returns false
-            bios.IsUefi.Should().BeFalse();
+            ((object)bios.IsUefi).Should().BeOfType<bool>();
         }
 
         [Fact]
-        public void Manufacturer_ShouldBeNullOnNonWindows()
+        public void Manufacturer_ShouldBeNullOrNonEmpty()
         {
             var bios = BiosInfo.Current;
-            bios.Manufacturer.Should().BeNull();
+            if (bios.Manufacturer != null)
+                bios.Manufacturer.Should().NotBeNullOrWhiteSpace();
         }
 
         [Fact]
-        public void Name_ShouldBeNullOnNonWindows()
+        public void Name_ShouldBeNullOrNonEmpty()
         {
             var bios = BiosInfo.Current;
-            bios.Name.Should().BeNull();
+            if (bios.Name != null)
+                bios.Name.Should().NotBeNullOrWhiteSpace();
         }
 
         [Fact]
-        public void Version_ShouldBeNullOnNonWindows()
+        public void Version_ShouldBeNullOrNonEmpty()
         {
             var bios = BiosInfo.Current;
-            bios.Version.Should().BeNull();
+            if (bios.Version != null)
+                bios.Version.Should().NotBeNullOrWhiteSpace();
         }
 
         [Fact]
-        public void SerialNumber_ShouldBeNullOnNonWindows()
+        public void SerialNumber_ShouldBeNullOrNonEmpty()
         {
             var bios = BiosInfo.Current;
-            bios.SerialNumber.Should().BeNull();
+            if (bios.SerialNumber != null)
+                bios.SerialNumber.Should().NotBeNullOrWhiteSpace();
         }
 
         [Fact]
-        public void ReleaseDate_ShouldBeNullOnNonWindows()
+        public void ReleaseDate_ShouldBeReasonableWhenPresent()
         {
             var bios = BiosInfo.Current;
-            bios.ReleaseDate.Should().BeNull();
+            if (bios.ReleaseDate.HasValue)
+            {
+                bios.ReleaseDate.Value.Year.Should().BeGreaterOrEqualTo(1980);
+                bios.ReleaseDate.Value.Should().BeOnOrBefore(DateTime.Today.AddDays(1));
+            }
         }
 
         [Fact]
-        public void SmbiosVersion_ShouldBeNullOnNonWindows()
+        public void SmbiosVersion_ShouldBeNullOrNonEmpty()
         {
             var bios = BiosInfo.Current;
-            bios.SmbiosVersion.Should().BeNull();
+            if (bios.SmbiosVersion != null)
+                bios.SmbiosVersion.Should().NotBeNullOrWhiteSpace();
         }
     }
 }

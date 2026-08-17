@@ -11,7 +11,7 @@ BPlusLib.Foundation is a production-ready C# utility library for Windows desktop
 | | |
 |---|---|
 | **Targets** | net472 · net6.0 · net8.0 |
-**Version** | 2.12.0
+**Version** | 2.12.1
 | **License** | MIT |
 | **Tests** | 1,309 (1,217 passing, 92 skipped — Windows-only) |
 | **Author** | [thanhbinhqs](https://github.com/thanhbinhqs) |
@@ -314,11 +314,11 @@ dotnet pack -c Release
 ```
 Source: https://nuget.pkg.github.com/thanhbinhqs/index.json
 Package: BPlusLib.Foundation
-Version: 2.10.1
+Version: 2.12.1
 ```
 
 ```bash
-dotnet add package BPlusLib.Foundation --version 2.10.1 --source "https://nuget.pkg.github.com/thanhbinhqs/index.json"
+dotnet add package BPlusLib.Foundation --version 2.12.1 --source "https://nuget.pkg.github.com/thanhbinhqs/index.json"
 ```
 
 ## License

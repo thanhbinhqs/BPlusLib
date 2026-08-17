@@ -235,24 +235,20 @@ namespace BPlusLib.Foundation.Security
 
                     try
                     {
-                        // Get the user SID from the token, then resolve to account name
-                        if (!TokenHelper.GetTokenInformation(tokenHandle, TOKEN_INFORMATION_CLASS.TokenUser, out byte[]? data) || data == null)
+                        if (!TokenHelper.TryGetTokenInformationBuffer(tokenHandle, TOKEN_INFORMATION_CLASS.TokenUser, out IntPtr buffer, out int returnLength))
                             return null;
 
-                        int sidAndAttrSize = Marshal.SizeOf<SID_AND_ATTRIBUTES>();
-                        if (data.Length < sidAndAttrSize)
-                            return null;
-
-                        GCHandle handle = GCHandle.Alloc(data, GCHandleType.Pinned);
                         try
                         {
-                            IntPtr ptr = handle.AddrOfPinnedObject();
-                            var tokenUser = Marshal.PtrToStructure<TOKEN_USER>(ptr);
+                            if (returnLength < Marshal.SizeOf<TOKEN_USER>())
+                                return null;
+
+                            var tokenUser = Marshal.PtrToStructure<TOKEN_USER>(buffer);
                             return TokenHelper.SidToAccountName(tokenUser.User.Sid);
                         }
                         finally
                         {
-                            handle.Free();
+                            Marshal.FreeHGlobal(buffer);
                         }
                     }
                     finally
@@ -548,20 +544,25 @@ namespace BPlusLib.Foundation.Security
             // Build the Administrators SID: S-1-5-32-544
             byte[] adminSid = BuildAdministratorsSid();
 
-            // Get token groups
-            if (!TokenHelper.GetTokenInformation(tokenHandle, TOKEN_INFORMATION_CLASS.TokenGroups, out byte[]? data) || data == null)
+            if (!TokenHelper.TryGetTokenInformationBuffer(tokenHandle, TOKEN_INFORMATION_CLASS.TokenGroups, out IntPtr buffer, out int returnLength))
                 return false;
 
-            GCHandle handle = GCHandle.Alloc(data, GCHandleType.Pinned);
             try
             {
-                IntPtr ptr = handle.AddrOfPinnedObject();
-                uint groupCount = (uint)Marshal.ReadInt32(ptr);
+                if (returnLength < Marshal.SizeOf<uint>())
+                    return false;
+
+                uint groupCount = (uint)Marshal.ReadInt32(buffer);
                 if (groupCount == 0)
                     return false;
 
                 int sidAndAttrSize = Marshal.SizeOf<SID_AND_ATTRIBUTES>();
-                IntPtr groupsPtr = IntPtr.Add(ptr, Marshal.SizeOf<uint>());
+                int groupsOffset = (int)Marshal.OffsetOf<TOKEN_GROUPS>(nameof(TOKEN_GROUPS.Groups));
+                IntPtr groupsPtr = IntPtr.Add(buffer, groupsOffset);
+
+                int requiredBytes = groupsOffset + ((int)groupCount * sidAndAttrSize);
+                if (returnLength < requiredBytes)
+                    return false;
 
                 for (int i = 0; i < groupCount; i++)
                 {
@@ -580,7 +581,7 @@ namespace BPlusLib.Foundation.Security
             }
             finally
             {
-                handle.Free();
+                Marshal.FreeHGlobal(buffer);
             }
         }
 

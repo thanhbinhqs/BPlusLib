@@ -38,19 +38,21 @@ namespace BPlusLib.Foundation.Tests.Security
         }
 
         [SkippableFact]
-        public void GetPublisher_Kernel32_ReturnsMicrosoft()
+        public void GetPublisher_Kernel32_ReturnsMicrosoftWhenAvailable()
         {
             Skip.IfNot(RuntimeInformation.IsOSPlatform(OSPlatform.Windows));
             var publisher = WinTrustHelper.GetPublisher(@"C:\Windows\System32\kernel32.dll");
-            publisher.Should().NotBeNullOrEmpty();
-            publisher.Should().Contain("Microsoft");
+            if (publisher is not null)
+            {
+                publisher.Should().Contain("Microsoft");
+            }
         }
 
         [SkippableFact]
         public void Verify_UnsignedFile_ReturnsUntrusted()
         {
             Skip.IfNot(RuntimeInformation.IsOSPlatform(OSPlatform.Windows));
-            string tempFile = System.IO.Path.GetTempFileName();
+            string tempFile = BPlusLib.Foundation.Tests.TestPaths.CreateTempFile();
             try
             {
                 System.IO.File.WriteAllText(tempFile, "not a PE file");

@@ -27,7 +27,7 @@ namespace BPlusLib.Foundation.Tests.IO
 
         public ChecksumHelperTests()
         {
-            _tempFile = Path.Combine(Path.GetTempPath(), "ChecksumHelperTests_" + Guid.NewGuid().ToString("N") + ".txt");
+            _tempFile = Path.Combine(TestPaths.TempRoot, "ChecksumHelperTests_" + Guid.NewGuid().ToString("N") + ".txt");
             // Write "Hello World" without BOM and without trailing newline
             File.WriteAllText(_tempFile, Content, new System.Text.UTF8Encoding(encoderShouldEmitUTF8Identifier: false));
         }
@@ -106,7 +106,7 @@ namespace BPlusLib.Foundation.Tests.IO
         [Fact]
         public void ComputeHash_WithNonExistentFile_ShouldReturn_ERROR()
         {
-            string path = Path.Combine(Path.GetTempPath(), "nonexistent_file_xyz.txt");
+            string path = Path.Combine(TestPaths.TempRoot, "nonexistent_file_xyz.txt");
             string hash = ChecksumHelper.ComputeHash(path, HashAlgorithmName.MD5);
             hash.Should().Be("ERROR");
         }
@@ -114,7 +114,7 @@ namespace BPlusLib.Foundation.Tests.IO
         [Fact]
         public void ComputeMD5_WithNonExistentFile_ShouldReturn_ERROR()
         {
-            string path = Path.Combine(Path.GetTempPath(), "nonexistent_file_xyz.txt");
+            string path = Path.Combine(TestPaths.TempRoot, "nonexistent_file_xyz.txt");
             string hash = ChecksumHelper.ComputeMD5(path);
             hash.Should().Be("ERROR");
         }
@@ -122,7 +122,7 @@ namespace BPlusLib.Foundation.Tests.IO
         [Fact]
         public void ComputeSHA256_WithNonExistentFile_ShouldReturn_ERROR()
         {
-            string path = Path.Combine(Path.GetTempPath(), "nonexistent_file_xyz.txt");
+            string path = Path.Combine(TestPaths.TempRoot, "nonexistent_file_xyz.txt");
             string hash = ChecksumHelper.ComputeSHA256(path);
             hash.Should().Be("ERROR");
         }
@@ -130,7 +130,7 @@ namespace BPlusLib.Foundation.Tests.IO
         [Fact]
         public void ComputeCRC32_WithNonExistentFile_ShouldReturn_ERROR()
         {
-            string path = Path.Combine(Path.GetTempPath(), "nonexistent_file_xyz.txt");
+            string path = Path.Combine(TestPaths.TempRoot, "nonexistent_file_xyz.txt");
             string hash = ChecksumHelper.ComputeCRC32(path);
             hash.Should().Be("ERROR");
         }
@@ -161,7 +161,7 @@ namespace BPlusLib.Foundation.Tests.IO
         [Fact]
         public void VerifyHash_WithNonExistentFile_ShouldReturnFalse()
         {
-            string path = Path.Combine(Path.GetTempPath(), "no_file_for_verify.txt");
+            string path = Path.Combine(TestPaths.TempRoot, "no_file_for_verify.txt");
             bool result = ChecksumHelper.VerifyHash(path, ExpectedSha256, HashAlgorithmName.SHA256);
             result.Should().BeFalse();
         }
@@ -179,7 +179,7 @@ namespace BPlusLib.Foundation.Tests.IO
         [Fact]
         public void ComputeCRC32_EmptyFile_ShouldBeExpected()
         {
-            string emptyFile = Path.Combine(Path.GetTempPath(), "empty_crc_" + Guid.NewGuid().ToString("N") + ".tmp");
+            string emptyFile = Path.Combine(TestPaths.TempRoot, "empty_crc_" + Guid.NewGuid().ToString("N") + ".tmp");
             try
             {
                 File.WriteAllText(emptyFile, string.Empty);

@@ -132,17 +132,19 @@ namespace BPlusLib.Foundation.Tests.Process
             // On Windows, returns the full path to the executable
         }
 
-        [Fact]
+        [SkippableFact]
         public void KillTree_ShouldNotThrow()
         {
+            Skip.If(TestPlatform.IsWindows(), "Calling KillTree on the test host process is destructive on Windows.");
             var proc = CurrentProcess;
             Action act = () => proc.KillTree();
             act.Should().NotThrow();
         }
 
-        [Fact]
+        [SkippableFact]
         public void KillTree_ShouldNotKillCurrentProcess()
         {
+            Skip.If(TestPlatform.IsWindows(), "Calling KillTree on the test host process is destructive on Windows.");
             // Just verify it doesn't crash or kill anything
             var proc = CurrentProcess;
             var ex = Record.Exception(() => proc.KillTree());

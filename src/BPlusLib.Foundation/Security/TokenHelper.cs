@@ -422,24 +422,20 @@ namespace BPlusLib.Foundation.Security
         {
             try
             {
-                if (!GetTokenInformation(tokenHandle, TOKEN_INFORMATION_CLASS.TokenUser, out byte[]? data) || data == null)
+                if (!TryGetTokenInformationBuffer(tokenHandle, TOKEN_INFORMATION_CLASS.TokenUser, out IntPtr buffer, out int returnLength))
                     return null;
 
-                // Parse the TOKEN_USER structure
-                int sidAndAttrSize = Marshal.SizeOf<SID_AND_ATTRIBUTES>();
-                if (data.Length < sidAndAttrSize)
-                    return null;
-
-                GCHandle handle = GCHandle.Alloc(data, GCHandleType.Pinned);
                 try
                 {
-                    IntPtr ptr = handle.AddrOfPinnedObject();
-                    var tokenUser = Marshal.PtrToStructure<TOKEN_USER>(ptr);
+                    if (returnLength < Marshal.SizeOf<TOKEN_USER>())
+                        return null;
+
+                    var tokenUser = Marshal.PtrToStructure<TOKEN_USER>(buffer);
                     return SidToString(tokenUser.User.Sid);
                 }
                 finally
                 {
-                    handle.Free();
+                    Marshal.FreeHGlobal(buffer);
                 }
             }
             catch (EntryPointNotFoundException)
@@ -465,20 +461,26 @@ namespace BPlusLib.Foundation.Security
         {
             try
             {
-                if (!GetTokenInformation(tokenHandle, TOKEN_INFORMATION_CLASS.TokenGroups, out byte[]? data) || data == null)
+                if (!TryGetTokenInformationBuffer(tokenHandle, TOKEN_INFORMATION_CLASS.TokenGroups, out IntPtr buffer, out int returnLength))
                     return null;
 
-                GCHandle handle = GCHandle.Alloc(data, GCHandleType.Pinned);
                 try
                 {
-                    IntPtr ptr = handle.AddrOfPinnedObject();
-                    uint groupCount = (uint)Marshal.ReadInt32(ptr);
+                    if (returnLength < Marshal.SizeOf<uint>())
+                        return null;
+
+                    uint groupCount = (uint)Marshal.ReadInt32(buffer);
                     if (groupCount == 0)
                         return Array.Empty<string>();
 
                     var groups = new string[groupCount];
                     int sidAndAttrSize = Marshal.SizeOf<SID_AND_ATTRIBUTES>();
-                    IntPtr groupsPtr = IntPtr.Add(ptr, Marshal.SizeOf<uint>());
+                    int groupsOffset = (int)Marshal.OffsetOf<TOKEN_GROUPS>(nameof(TOKEN_GROUPS.Groups));
+                    IntPtr groupsPtr = IntPtr.Add(buffer, groupsOffset);
+
+                    int requiredBytes = groupsOffset + ((int)groupCount * sidAndAttrSize);
+                    if (returnLength < requiredBytes)
+                        return null;
 
                     for (int i = 0; i < groupCount; i++)
                     {
@@ -491,7 +493,7 @@ namespace BPlusLib.Foundation.Security
                 }
                 finally
                 {
-                    handle.Free();
+                    Marshal.FreeHGlobal(buffer);
                 }
             }
             catch (EntryPointNotFoundException)
@@ -706,6 +708,33 @@ namespace BPlusLib.Foundation.Security
 
             // Fall back to PROCESS_QUERY_INFORMATION
             return OpenProcess(ProcessQueryInformation, false, processId);
+        }
+
+        internal static bool TryGetTokenInformationBuffer(
+            IntPtr tokenHandle,
+            TOKEN_INFORMATION_CLASS infoClass,
+            out IntPtr buffer,
+            out int returnLength)
+        {
+            buffer = IntPtr.Zero;
+            returnLength = 0;
+
+            GetTokenInformation(tokenHandle, infoClass, IntPtr.Zero, 0, out int requiredSize);
+            int error = Marshal.GetLastWin32Error();
+            if (error != 122 && error != 0)
+                return false;
+
+            if (requiredSize <= 0)
+                return false;
+
+            buffer = Marshal.AllocHGlobal(requiredSize);
+            if (GetTokenInformation(tokenHandle, infoClass, buffer, requiredSize, out returnLength))
+                return true;
+
+            Marshal.FreeHGlobal(buffer);
+            buffer = IntPtr.Zero;
+            returnLength = 0;
+            return false;
         }
 
         /// <summary>

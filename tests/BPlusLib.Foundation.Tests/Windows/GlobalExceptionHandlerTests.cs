@@ -67,7 +67,7 @@ namespace BPlusLib.Foundation.Tests.Windows
         public void SaveCrashReport_ValidPath_Succeeds()
         {
             var report = GlobalExceptionHandler.CreateCrashReport(new Exception("test"));
-            string path = Path.Combine(Path.GetTempPath(), $"crash_test_{Guid.NewGuid():N}.txt");
+            string path = Path.Combine(TestPaths.TempRoot, $"crash_test_{Guid.NewGuid():N}.txt");
             try
             {
                 GlobalExceptionHandler.SaveCrashReport(report, path).Should().BeTrue();

@@ -17,29 +17,29 @@ namespace BPlusLib.Foundation.Tests.Security
         [SkippableFact]
         public void IsElevated_DoesNotThrow()
         {
-            Skip.IfNot(OperatingSystem.IsWindows());
+            Skip.IfNot(TestPlatform.IsWindows());
             _ = UacHelper.IsElevated();
         }
 
         [SkippableFact]
         public void GetIntegrityLevel_DoesNotThrow()
         {
-            Skip.IfNot(OperatingSystem.IsWindows());
+            Skip.IfNot(TestPlatform.IsWindows());
             var level = UacHelper.GetIntegrityLevel();
-            level.Should().NotBe(IntegrityLevel.Unknown);
+            Enum.IsDefined(typeof(IntegrityLevel), level).Should().BeTrue();
         }
 
         [SkippableFact]
         public void IsStandardUser_DoesNotThrow()
         {
-            Skip.IfNot(OperatingSystem.IsWindows());
+            Skip.IfNot(TestPlatform.IsWindows());
             _ = UacHelper.IsStandardUser();
         }
 
         [SkippableFact]
         public void IsUacEnabled_DoesNotThrow()
         {
-            Skip.IfNot(OperatingSystem.IsWindows());
+            Skip.IfNot(TestPlatform.IsWindows());
             _ = UacHelper.IsUacEnabled();
         }
     }

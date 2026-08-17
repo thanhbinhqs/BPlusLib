@@ -19,7 +19,7 @@ namespace BPlusLib.Foundation.Tests.SystemInfo
         [SkippableFact]
         public void CreateAndOpen_SharedMemory()
         {
-            Skip.IfNot(OperatingSystem.IsWindows());
+            Skip.IfNot(TestPlatform.IsWindows());
 
             const int size = 1024;
             const int testValue = unchecked((int)0xABCDEF01);
@@ -49,7 +49,7 @@ namespace BPlusLib.Foundation.Tests.SystemInfo
         [SkippableFact]
         public void Create_ZeroSize_ReturnsNull()
         {
-            Skip.IfNot(OperatingSystem.IsWindows());
+            Skip.IfNot(TestPlatform.IsWindows());
 
             var view = MemoryHelper.CreateOrOpen("BPlusLib_Test_ZeroSize", 0);
             view.Should().BeNull();
@@ -58,7 +58,7 @@ namespace BPlusLib.Foundation.Tests.SystemInfo
         [SkippableFact]
         public void Open_NonExistent_ReturnsNull()
         {
-            Skip.IfNot(OperatingSystem.IsWindows());
+            Skip.IfNot(TestPlatform.IsWindows());
 
             var view = MemoryHelper.Open("BPlusLib_Test_NonExistent_" + Guid.NewGuid());
             view.Should().BeNull();
@@ -67,7 +67,7 @@ namespace BPlusLib.Foundation.Tests.SystemInfo
         [SkippableFact]
         public void GetProcessMemoryCounters_ReturnsNonZero()
         {
-            Skip.IfNot(OperatingSystem.IsWindows());
+            Skip.IfNot(TestPlatform.IsWindows());
 
             var counters = MemoryHelper.GetProcessMemoryCounters();
             counters.Should().NotBeNull();
@@ -79,7 +79,7 @@ namespace BPlusLib.Foundation.Tests.SystemInfo
         [SkippableFact]
         public void Dispose_View_MultipleCalls()
         {
-            Skip.IfNot(OperatingSystem.IsWindows());
+            Skip.IfNot(TestPlatform.IsWindows());
 
             var view = MemoryHelper.CreateOrOpen("BPlusLib_Test_DisposeMultiple", 64);
             view.Should().NotBeNull();

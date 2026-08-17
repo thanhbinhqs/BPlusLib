@@ -20,7 +20,7 @@ namespace BPlusLib.Foundation.Tests.IO
 
         public SafeFileOpsTests()
         {
-            _tempDir = Path.Combine(Path.GetTempPath(), "SafeFileOpsTests_" + Guid.NewGuid().ToString("N"));
+            _tempDir = Path.Combine(TestPaths.TempRoot, "SafeFileOpsTests_" + Guid.NewGuid().ToString("N"));
             Directory.CreateDirectory(_tempDir);
         }
 

@@ -5,6 +5,7 @@ using System.Threading;
 using System.Windows.Forms;
 using NLog;
 using NLog.Targets;
+using NLogLogLevel = NLog.LogLevel;
 
 namespace BPlusLib.Foundation.Logging
 {
@@ -15,7 +16,7 @@ namespace BPlusLib.Foundation.Logging
     /// lazily on first write.
     /// </summary>
     [Target("RichTextBox")]
-    public sealed class RichTextBoxLogTarget : TargetWithLayout, IDisposable
+    public class RichTextBoxLogTarget : TargetWithLayout, IDisposable
     {
         private readonly RichTextBox _textBox;
         private SynchronizationContext? _syncContext;
@@ -81,6 +82,11 @@ namespace BPlusLib.Foundation.Logging
             }
         }
 
+        internal void WriteForTests(LogEventInfo logEvent)
+        {
+            Write(logEvent);
+        }
+
         /// <summary>
         /// Appends text to the RichTextBox. Always called on UI thread.
         /// No lock — single-threaded UI access guaranteed by marshaling.
@@ -117,21 +123,21 @@ namespace BPlusLib.Foundation.Logging
             }
         }
 
-        private static Color GetColorForLevel(LogLevel level)
+        private static Color GetColorForLevel(NLogLogLevel level)
         {
-            if (level == LogLevel.Trace) return Color.Gray;
-            if (level == LogLevel.Debug) return Color.LightGray;
-            if (level == LogLevel.Info) return Color.White;
-            if (level == LogLevel.Warn) return Color.Yellow;
-            if (level == LogLevel.Error) return Color.OrangeRed;
-            if (level == LogLevel.Fatal) return Color.Red;
+            if (level == NLogLogLevel.Trace) return Color.Gray;
+            if (level == NLogLogLevel.Debug) return Color.LightGray;
+            if (level == NLogLogLevel.Info) return Color.White;
+            if (level == NLogLogLevel.Warn) return Color.Yellow;
+            if (level == NLogLogLevel.Error) return Color.OrangeRed;
+            if (level == NLogLogLevel.Fatal) return Color.Red;
             return Color.White;
         }
 
         /// <summary>
         /// Disposes the target and detaches from the RichTextBox.
         /// </summary>
-        public void Dispose()
+        public new void Dispose()
         {
             if (_disposed) return;
             _disposed = true;

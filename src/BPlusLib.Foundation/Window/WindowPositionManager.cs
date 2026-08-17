@@ -49,7 +49,7 @@ namespace BPlusLib.Foundation.Window
             Guard.ThrowIfNull(form);
             Guard.ThrowIfNullOrWhiteSpace(key);
 
-            using var keyRoot = Registry.CurrentUser.CreateSubKey(GetWindowKey(key));
+            using var keyRoot = Microsoft.Win32.Registry.CurrentUser.CreateSubKey(GetWindowKey(key));
             if (keyRoot == null)
                 return;
 
@@ -84,7 +84,7 @@ namespace BPlusLib.Foundation.Window
             Guard.ThrowIfNull(form);
             Guard.ThrowIfNullOrWhiteSpace(key);
 
-            using var keyRoot = Registry.CurrentUser.OpenSubKey(GetWindowKey(key));
+            using var keyRoot = Microsoft.Win32.Registry.CurrentUser.OpenSubKey(GetWindowKey(key));
             if (keyRoot == null)
                 return false;
 
@@ -139,7 +139,7 @@ namespace BPlusLib.Foundation.Window
 
             try
             {
-                using var appKey = Registry.CurrentUser.OpenSubKey(GetAppKey(), writable: true);
+                using var appKey = Microsoft.Win32.Registry.CurrentUser.OpenSubKey(GetAppKey(), writable: true);
                 if (appKey != null)
                 {
                     appKey.DeleteSubKeyTree(key, throwOnMissingSubKey: false);

@@ -20,7 +20,7 @@ namespace BPlusLib.Foundation.Tests.IO
         [SkippableFact]
         public void GetVersionInfo_Kernel32_ReturnsData()
         {
-            Skip.IfNot(OperatingSystem.IsWindows());
+            Skip.IfNot(TestPlatform.IsWindows());
 
             string kernel32 = Path.Combine(
                 Environment.GetFolderPath(Environment.SpecialFolder.System),
@@ -36,7 +36,7 @@ namespace BPlusLib.Foundation.Tests.IO
         [SkippableFact]
         public void GetFileVersion_Kernel32_ReturnsVersion()
         {
-            Skip.IfNot(OperatingSystem.IsWindows());
+            Skip.IfNot(TestPlatform.IsWindows());
 
             string kernel32 = Path.Combine(
                 Environment.GetFolderPath(Environment.SpecialFolder.System),
@@ -50,7 +50,7 @@ namespace BPlusLib.Foundation.Tests.IO
         [SkippableFact]
         public void GetCompanyName_Kernel32_ReturnsMicrosoft()
         {
-            Skip.IfNot(OperatingSystem.IsWindows());
+            Skip.IfNot(TestPlatform.IsWindows());
 
             string kernel32 = Path.Combine(
                 Environment.GetFolderPath(Environment.SpecialFolder.System),
@@ -69,7 +69,7 @@ namespace BPlusLib.Foundation.Tests.IO
         public void GetVersionInfo_TextFile_ReturnsNull()
         {
             // Create a temporary text file (not a PE file)
-            string tempFile = Path.GetTempFileName();
+            string tempFile = TestPaths.CreateTempFile();
             try
             {
                 File.WriteAllText(tempFile, "not a PE file");

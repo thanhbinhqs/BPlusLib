@@ -225,7 +225,7 @@ namespace BPlusLib.Foundation.Tests.VirtualSerial
         [Fact]
         public void ConfigurationLoader_SaveAndLoadFile()
         {
-            var tempFile = Path.GetTempFileName();
+            var tempFile = TestPaths.CreateTempFile();
             try
             {
                 var config = ConfigurationLoader.CreateDefault();

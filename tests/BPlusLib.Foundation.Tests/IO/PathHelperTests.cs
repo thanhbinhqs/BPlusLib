@@ -19,7 +19,7 @@ namespace BPlusLib.Foundation.Tests.IO
 
         public PathHelperTests()
         {
-            _tempDir = Path.Combine(Path.GetTempPath(), "PathHelperTests_" + Guid.NewGuid().ToString("N"));
+            _tempDir = Path.Combine(TestPaths.TempRoot, "PathHelperTests_" + Guid.NewGuid().ToString("N"));
             Directory.CreateDirectory(_tempDir);
         }
 
@@ -167,7 +167,7 @@ namespace BPlusLib.Foundation.Tests.IO
         {
             string? relative = PathHelper.GetRelativePath("/home/user/docs/file.txt", "/home/user/");
             relative.Should().NotBeNull();
-            relative.Should().Be("docs/file.txt");
+            relative.Should().Be(Path.Combine("docs", "file.txt"));
         }
 
         [Fact]

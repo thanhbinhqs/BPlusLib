@@ -10,6 +10,7 @@ using System.Drawing;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using Timer = System.Threading.Timer;
 using BPlusLib.Foundation.Common;
 using BPlusLib.Foundation.Native;
 

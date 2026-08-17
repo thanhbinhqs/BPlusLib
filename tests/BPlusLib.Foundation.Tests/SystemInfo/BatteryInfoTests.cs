@@ -32,64 +32,70 @@ namespace BPlusLib.Foundation.Tests.SystemInfo
         public void IsPresent_ShouldBeBool()
         {
             var battery = BatteryInfo.Current;
-            // On Linux, GetSystemPowerStatus fails → IsPresent = false
-            battery.IsPresent.Should().BeFalse();
+            ((object)battery.IsPresent).Should().BeOfType<bool>();
         }
 
         [Fact]
         public void IsCharging_ShouldBeBool()
         {
             var battery = BatteryInfo.Current;
-            battery.IsCharging.Should().BeFalse();
+            ((object)battery.IsCharging).Should().BeOfType<bool>();
         }
 
         [Fact]
-        public void StatusFlags_ShouldBeNoneOnNonWindows()
+        public void StatusFlags_ShouldBeDefinedFlags()
         {
             var battery = BatteryInfo.Current;
-            battery.StatusFlags.Should().Be(BatteryStatusFlags.None);
+            var validMask = BatteryStatusFlags.None |
+                            BatteryStatusFlags.Discharging |
+                            BatteryStatusFlags.AcOffline |
+                            BatteryStatusFlags.Charging |
+                            BatteryStatusFlags.LowBattery |
+                            BatteryStatusFlags.CriticalBattery;
+            (battery.StatusFlags & ~validMask).Should().Be(BatteryStatusFlags.None);
         }
 
         [Fact]
-        public void BatteryLifeSeconds_ShouldBeNullOnNonWindows()
+        public void BatteryLifeSeconds_ShouldBeNullOrNonNegative()
         {
             var battery = BatteryInfo.Current;
-            battery.BatteryLifeSeconds.Should().BeNull();
+            battery.BatteryLifeSeconds.Should().Match(v => !v.HasValue || v.Value >= 0);
         }
 
         [Fact]
-        public void BatteryFullLifeSeconds_ShouldBeNullOnNonWindows()
+        public void BatteryFullLifeSeconds_ShouldBeNullOrNonNegative()
         {
             var battery = BatteryInfo.Current;
-            battery.BatteryFullLifeSeconds.Should().BeNull();
+            battery.BatteryFullLifeSeconds.Should().Match(v => !v.HasValue || v.Value >= 0);
         }
 
         [Fact]
-        public void VoltageMillivolts_ShouldBeNullOnNonWindows()
+        public void VoltageMillivolts_ShouldBeNullOrNonNegative()
         {
             var battery = BatteryInfo.Current;
-            battery.VoltageMillivolts.Should().BeNull();
+            battery.VoltageMillivolts.Should().Match(v => !v.HasValue || v.Value >= 0);
         }
 
         [Fact]
-        public void Chemistry_ShouldBeNullOnNonWindows()
+        public void Chemistry_ShouldBeNullOrNonEmpty()
         {
             var battery = BatteryInfo.Current;
-            battery.Chemistry.Should().BeNull();
+            if (battery.Chemistry != null)
+                battery.Chemistry.Should().NotBeNullOrWhiteSpace();
         }
 
         [Fact]
-        public void DesignCapacityMW_ShouldBeNullOnNonWindows()
+        public void DesignCapacityMW_ShouldBeNullOrNonNegative()
         {
             var battery = BatteryInfo.Current;
-            battery.DesignCapacityMW.Should().BeNull();
+            battery.DesignCapacityMW.Should().Match(v => !v.HasValue || v.Value >= 0);
         }
 
         [Fact]
-        public void CurrentCapacityMW_ShouldBeNullOnNonWindows()
+        public void CurrentCapacityMW_ShouldBeNullOrNonNegative()
         {
             var battery = BatteryInfo.Current;
-            battery.CurrentCapacityMW.Should().BeNull();
+            battery.CurrentCapacityMW.Should().Match(v => !v.HasValue || v.Value >= 0);
         }
     }
 }

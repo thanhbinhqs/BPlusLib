@@ -12,7 +12,8 @@ namespace BPlusLib.Foundation.Tests.Logging
 
         public NLogLoggerTests()
         {
-            _tempDir = Path.Combine(Path.GetTempPath(), "BPlusLib_NLogTests_" + Guid.NewGuid().ToString("N")[..8]);
+            var suffix = Guid.NewGuid().ToString("N").Substring(0, 8);
+            _tempDir = Path.Combine(TestPaths.TempRoot, "BPlusLib_NLogTests_" + suffix);
             Directory.CreateDirectory(_tempDir);
         }
 
@@ -27,6 +28,7 @@ namespace BPlusLib.Foundation.Tests.Logging
             var logPath = Path.Combine(_tempDir, "test.log");
             using var logger = new NLogLogger(logPath, NLog.LogLevel.Debug);
             logger.Info("Test message");
+            logger.Dispose();
             File.Exists(logPath).Should().BeTrue();
             File.ReadAllText(logPath).Should().Contain("INFO").And.Contain("Test message");
         }
@@ -37,6 +39,7 @@ namespace BPlusLib.Foundation.Tests.Logging
             var logPath = Path.Combine(_tempDir, "error.log");
             using var logger = new NLogLogger(logPath, NLog.LogLevel.Debug);
             logger.Error("Something failed", new InvalidOperationException("boom"));
+            logger.Dispose();
             var content = File.ReadAllText(logPath);
             content.Should().Contain("ERROR").And.Contain("Something failed").And.Contain("boom");
         }
@@ -50,6 +53,7 @@ namespace BPlusLib.Foundation.Tests.Logging
             logger.Info("should not appear");
             logger.Warn("should appear");
             logger.Error("should appear");
+            logger.Dispose();
             var content = File.ReadAllText(logPath);
             content.Should().NotContain("should not appear");
             content.Should().Contain("should appear");
@@ -61,6 +65,7 @@ namespace BPlusLib.Foundation.Tests.Logging
             var logPath = Path.Combine(_tempDir, "factory.log");
             using var logger = RichTextBoxLoggerFactory.CreateFileOnly(logPath, NLog.LogLevel.Debug);
             logger.Info("Factory test");
+            logger.Dispose();
             File.Exists(logPath).Should().BeTrue();
             File.ReadAllText(logPath).Should().Contain("Factory test");
         }

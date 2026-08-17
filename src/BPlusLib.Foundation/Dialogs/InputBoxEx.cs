@@ -67,7 +67,7 @@ public static class InputBoxEx
                                 form.Handle,
                                 ownerHandle,
                                 0, 0, 0, 0,
-                                User32.SWP_NOSIZE | User32.SWP_NOACTIVATE | User32.SWP_NOMOVE);
+                                User32.SWP_NOSIZE | User32.SWP_NOACTIVATE | User32.SWP_NOZORDER);
                         }
                     };
                 }
@@ -81,18 +81,18 @@ public static class InputBoxEx
                         {
                             if (!form.IsDisposed)
                             {
-                                form.DialogResult = DialogResult.Cancel;
+                                form.DialogResult = FormsDialogResult.Cancel;
                                 form.Close();
                             }
                         });
                     }
                 });
 
-                DialogResult result = form.ShowDialog();
+                FormsDialogResult result = form.ShowDialog();
 
                 string? value = form.InputValue;
                 tcs.TrySetResult(new InputBoxResult<string>(
-                    result == DialogResult.OK,
+                    result == FormsDialogResult.OK,
                     value));
             }
             catch (OperationCanceledException)

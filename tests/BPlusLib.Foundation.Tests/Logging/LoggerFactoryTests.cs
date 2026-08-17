@@ -19,7 +19,7 @@ namespace BPlusLib.Foundation.Tests.Logging
 
         public LoggerFactoryTests()
         {
-            _tempDir = Path.Combine(Path.GetTempPath(), "LoggerFactoryTests_" + Guid.NewGuid().ToString("N"));
+            _tempDir = Path.Combine(TestPaths.TempRoot, "LoggerFactoryTests_" + Guid.NewGuid().ToString("N"));
             Directory.CreateDirectory(_tempDir);
         }
 
@@ -187,6 +187,7 @@ namespace BPlusLib.Foundation.Tests.Logging
             var logger = LoggerFactory.GetLogger("FactoryWriteTest");
             logger.Information("Factory logger test");
             logger.Flush();
+            LoggerFactory.Shutdown();
 
             string logFile = Path.Combine(_tempDir, "FactoryWriteTest.log");
             File.Exists(logFile).Should().BeTrue();

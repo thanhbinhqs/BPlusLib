@@ -18,7 +18,7 @@ namespace BPlusLib.Foundation.Tests.Power
         [SkippableFact]
         public void GetPowerStatus_ReturnsStatus()
         {
-            Skip.IfNot(OperatingSystem.IsWindows());
+            Skip.IfNot(TestPlatform.IsWindows());
 
             var status = PowerHelper.GetPowerStatus();
 
@@ -32,7 +32,7 @@ namespace BPlusLib.Foundation.Tests.Power
         [SkippableFact]
         public void IsOnBattery_ReturnsBool()
         {
-            Skip.IfNot(OperatingSystem.IsWindows());
+            Skip.IfNot(TestPlatform.IsWindows());
 
             // Just verifying the call completes without throwing
             bool result = PowerHelper.IsOnBattery();
@@ -43,7 +43,7 @@ namespace BPlusLib.Foundation.Tests.Power
         [SkippableFact]
         public void GetBatteryChargePercent_ReturnsValue()
         {
-            Skip.IfNot(OperatingSystem.IsWindows());
+            Skip.IfNot(TestPlatform.IsWindows());
 
             int percent = PowerHelper.GetBatteryChargePercent();
 
@@ -56,7 +56,7 @@ namespace BPlusLib.Foundation.Tests.Power
         [SkippableFact]
         public void LockWorkstation_DoesNotThrow()
         {
-            Skip.IfNot(OperatingSystem.IsWindows());
+            Skip.IfNot(TestPlatform.IsWindows());
 
             // We can't actually verify the workstation was locked,
             // but we can verify the call doesn't throw.
@@ -70,7 +70,7 @@ namespace BPlusLib.Foundation.Tests.Power
         [SkippableFact]
         public void PreventSleep_DoesNotThrow()
         {
-            Skip.IfNot(OperatingSystem.IsWindows());
+            Skip.IfNot(TestPlatform.IsWindows());
 
             uint prev = PowerHelper.PreventSleep(true);
             // Restore previous state

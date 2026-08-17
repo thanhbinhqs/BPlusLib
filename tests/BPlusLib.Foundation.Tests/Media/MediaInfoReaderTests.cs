@@ -29,7 +29,7 @@ namespace BPlusLib.Foundation.Tests.Media
 
         public MediaInfoReaderTests()
         {
-            _tempDir = Path.Combine(Path.GetTempPath(), "MediaInfoReaderTests_" + Guid.NewGuid().ToString("N"));
+            _tempDir = Path.Combine(TestPaths.TempRoot, "MediaInfoReaderTests_" + Guid.NewGuid().ToString("N"));
             Directory.CreateDirectory(_tempDir);
         }
 

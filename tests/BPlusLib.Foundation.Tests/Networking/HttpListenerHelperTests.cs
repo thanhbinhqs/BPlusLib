@@ -29,7 +29,7 @@ namespace BPlusLib.Foundation.Tests.Networking
         [SkippableFact]
         public void StartStop_Succeeds()
         {
-            Skip.IfNot(OperatingSystem.IsWindows());
+            Skip.IfNot(TestPlatform.IsWindows());
 
             int port = HttpListenerHelper.GetFreePort();
             string prefix = $"http://localhost:{port}/";
@@ -47,7 +47,7 @@ namespace BPlusLib.Foundation.Tests.Networking
         [SkippableFact]
         public async Task GetRequest_Roundtrip_ReturnsResponse()
         {
-            Skip.IfNot(OperatingSystem.IsWindows());
+            Skip.IfNot(TestPlatform.IsWindows());
 
             int port = HttpListenerHelper.GetFreePort();
             string prefix = $"http://localhost:{port}/";
@@ -79,7 +79,7 @@ namespace BPlusLib.Foundation.Tests.Networking
         [SkippableFact]
         public async Task SendJson_SendsJsonContentType()
         {
-            Skip.IfNot(OperatingSystem.IsWindows());
+            Skip.IfNot(TestPlatform.IsWindows());
 
             int port = HttpListenerHelper.GetFreePort();
             string prefix = $"http://localhost:{port}/";
@@ -117,7 +117,7 @@ namespace BPlusLib.Foundation.Tests.Networking
         [SkippableFact]
         public void Stop_AlreadyStopped_DoesNotThrow()
         {
-            Skip.IfNot(OperatingSystem.IsWindows());
+            Skip.IfNot(TestPlatform.IsWindows());
 
             bool result = HttpListenerHelper.Stop(null!);
             result.Should().BeFalse();

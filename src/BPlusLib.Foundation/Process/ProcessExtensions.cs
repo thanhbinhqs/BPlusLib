@@ -741,7 +741,14 @@ namespace BPlusLib.Foundation.Process
                 uint size = (uint)sb.Capacity;
                 if (QueryFullProcessImageNameW(hProcess, 0, sb, ref size))
                 {
-                    return sb.ToString(0, (int)size);
+                    string path = sb.ToString();
+                    if (size == 0)
+                    {
+                        return string.IsNullOrEmpty(path) ? null : path;
+                    }
+
+                    int safeLength = Math.Min((int)size, path.Length);
+                    return safeLength <= 0 ? null : path.Substring(0, safeLength);
                 }
 
                 // Fallback: GetModuleFileNameEx from psapi
@@ -844,6 +851,10 @@ namespace BPlusLib.Foundation.Process
                 return Task.FromResult(false);
             }
             catch (EntryPointNotFoundException)
+            {
+                return Task.FromResult(false);
+            }
+            catch (Win32Exception)
             {
                 return Task.FromResult(false);
             }

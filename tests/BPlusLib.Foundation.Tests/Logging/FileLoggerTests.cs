@@ -21,7 +21,7 @@ namespace BPlusLib.Foundation.Tests.Logging
 
         public FileLoggerTests()
         {
-            _tempDir = Path.Combine(Path.GetTempPath(), "FileLoggerTests_" + Guid.NewGuid().ToString("N"));
+            _tempDir = Path.Combine(TestPaths.TempRoot, "FileLoggerTests_" + Guid.NewGuid().ToString("N"));
             Directory.CreateDirectory(_tempDir);
         }
 

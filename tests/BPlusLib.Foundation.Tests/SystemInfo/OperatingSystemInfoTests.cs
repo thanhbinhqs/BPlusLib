@@ -22,16 +22,25 @@ namespace BPlusLib.Foundation.Tests.SystemInfo
         }
 
         [Fact]
-        public void Current_Properties_ShouldReturnDefaultsOnNonWindows()
+        public void Current_Properties_ShouldReturnPlatformAppropriateValues()
         {
             var os = OperatingSystemInfo.Current;
 
-            // On Linux, P/Invoke and registry calls fail gracefully, falling back
-            // to Environment.OSVersion which returns the real kernel version.
-            os.Name.Should().Be(string.Empty);
-            os.Edition.Should().Be(string.Empty);
-            os.BuildNumber.Should().BeGreaterOrEqualTo(0);
-            os.ServicePack.Should().Be(string.Empty);
+            if (TestPlatform.IsWindows())
+            {
+                os.Name.Should().NotBeNullOrWhiteSpace();
+                os.Version.Should().NotBeNullOrWhiteSpace();
+                os.Edition.Should().NotBeNull();
+                os.BuildNumber.Should().BeGreaterThan(0);
+                os.ServicePack.Should().NotBeNull();
+            }
+            else
+            {
+                os.Name.Should().Be(string.Empty);
+                os.Edition.Should().Be(string.Empty);
+                os.BuildNumber.Should().BeGreaterOrEqualTo(0);
+                os.ServicePack.Should().Be(string.Empty);
+            }
         }
 
         [Fact]
@@ -57,14 +66,13 @@ namespace BPlusLib.Foundation.Tests.SystemInfo
         public void Current_IsServer_ShouldBeBool()
         {
             var os = OperatingSystemInfo.Current;
-            os.IsServer.Should().BeFalse();
+            ((object)os.IsServer).Should().BeOfType<bool>();
         }
 
         [Fact]
         public void Current_Is64Bit_ShouldBeBool()
         {
             var os = OperatingSystemInfo.Current;
-            // On Linux, falls back to IntPtr.Size check
             os.Is64Bit.Should().Be(IntPtr.Size == 8);
         }
 

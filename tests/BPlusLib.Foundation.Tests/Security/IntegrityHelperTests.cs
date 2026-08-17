@@ -74,9 +74,10 @@ namespace BPlusLib.Foundation.Tests.Security
             result.Should().BeFalse();
         }
 
-        [Fact]
+        [SkippableFact]
         public void SetProcessIntegrityLevel_ShouldNotThrow()
         {
+            Skip.If(TestPlatform.IsWindows(), "Changing the test host integrity level mutates the live Windows process and destabilizes later tests.");
             Action act = () => IntegrityHelper.SetProcessIntegrityLevel(IntegrityLevel.Low);
             act.Should().NotThrow();
         }

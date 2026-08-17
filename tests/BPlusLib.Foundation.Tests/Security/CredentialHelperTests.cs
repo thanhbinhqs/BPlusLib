@@ -20,7 +20,7 @@ namespace BPlusLib.Foundation.Tests.Security
         [SkippableFact]
         public void WriteReadDelete_Roundtrips()
         {
-            Skip.IfNot(OperatingSystem.IsWindows());
+            Skip.IfNot(TestPlatform.IsWindows());
 
             string targetName = "BPlusLib.Test.Roundtrip." + Guid.NewGuid().ToString("N");
             const string userName = "testuser";
@@ -61,7 +61,7 @@ namespace BPlusLib.Foundation.Tests.Security
         [SkippableFact]
         public void Read_NonExistent_ReturnsNull()
         {
-            Skip.IfNot(OperatingSystem.IsWindows());
+            Skip.IfNot(TestPlatform.IsWindows());
 
             string targetName = "BPlusLib.Test.NonExistent." + Guid.NewGuid().ToString("N");
             var entry = CredentialHelper.Read(targetName);
@@ -74,7 +74,7 @@ namespace BPlusLib.Foundation.Tests.Security
         [SkippableFact]
         public void Delete_NonExistent_ReturnsFalse()
         {
-            Skip.IfNot(OperatingSystem.IsWindows());
+            Skip.IfNot(TestPlatform.IsWindows());
 
             string targetName = "BPlusLib.Test.DeleteNonExistent." + Guid.NewGuid().ToString("N");
             bool deleted = CredentialHelper.Delete(targetName);
@@ -87,7 +87,7 @@ namespace BPlusLib.Foundation.Tests.Security
         [SkippableFact]
         public void Enumerate_DoesNotThrow()
         {
-            Skip.IfNot(OperatingSystem.IsWindows());
+            Skip.IfNot(TestPlatform.IsWindows());
 
             var entries = CredentialHelper.Enumerate();
             entries.Should().NotBeNull();
@@ -99,7 +99,7 @@ namespace BPlusLib.Foundation.Tests.Security
         [SkippableFact]
         public void Write_NullOrEmptyTarget_ReturnsFalse()
         {
-            Skip.IfNot(OperatingSystem.IsWindows());
+            Skip.IfNot(TestPlatform.IsWindows());
 
             bool resultNull = CredentialHelper.Write(null!, "user", "pass");
             resultNull.Should().BeFalse();

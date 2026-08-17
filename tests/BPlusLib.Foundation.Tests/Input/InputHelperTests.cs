@@ -12,7 +12,7 @@ namespace BPlusLib.Foundation.Tests.Input
         [SkippableFact]
         public void SendKeyPress_DoesNotThrow()
         {
-            Skip.IfNot(OperatingSystem.IsWindows());
+            Skip.IfNot(TestPlatform.IsWindows());
             // May succeed or fail depending on UIPI — just verify no exception
             _ = InputHelper.SendKeyPress(VirtualKeyCode.A);
         }
@@ -20,7 +20,7 @@ namespace BPlusLib.Foundation.Tests.Input
         [SkippableFact]
         public void LeftClick_DoesNotThrow()
         {
-            Skip.IfNot(OperatingSystem.IsWindows());
+            Skip.IfNot(TestPlatform.IsWindows());
             _ = InputHelper.LeftClick();
         }
 
@@ -34,21 +34,21 @@ namespace BPlusLib.Foundation.Tests.Input
         [SkippableFact]
         public void SendText_NonEmpty_DoesNotThrow()
         {
-            Skip.IfNot(OperatingSystem.IsWindows());
+            Skip.IfNot(TestPlatform.IsWindows());
             _ = InputHelper.SendText("Hello");
         }
 
         [SkippableFact]
         public void MoveMouse_DoesNotThrow()
         {
-            Skip.IfNot(OperatingSystem.IsWindows());
+            Skip.IfNot(TestPlatform.IsWindows());
             _ = InputHelper.MoveMouse(100, 100, relative: true);
         }
 
         [SkippableFact]
         public void ScrollWheel_DoesNotThrow()
         {
-            Skip.IfNot(OperatingSystem.IsWindows());
+            Skip.IfNot(TestPlatform.IsWindows());
             _ = InputHelper.ScrollWheel(120);
         }
     }

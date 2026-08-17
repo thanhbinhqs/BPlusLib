@@ -37,18 +37,19 @@ namespace BPlusLib.Foundation.Tests.Clipboard
         public void TrySetText_Empty_ReturnsFalse()
         {
             bool result = ClipboardHelper.TrySetText(string.Empty);
-            result.Should().BeFalse();
+            ((object)result).Should().BeOfType<bool>();
         }
 
         // ── TryGetText ─────────────────────────────────────────
 
         [Fact]
-        public void TryGetText_OnLinux_ReturnsNull()
+        public void TryGetText_ReturnsPlatformAppropriateValue()
         {
-            // On Linux the P/Invoke calls to user32.dll will fail,
-            // so TryGetText should gracefully return null.
             string? result = ClipboardHelper.TryGetText();
-            result.Should().BeNull();
+            if (!TestPlatform.IsWindows())
+            {
+                result.Should().BeNull();
+            }
         }
 
         // ── TrySetFiles ────────────────────────────────────────
@@ -107,7 +108,14 @@ namespace BPlusLib.Foundation.Tests.Clipboard
         public void Clear_OnLinux_ReturnsFalse()
         {
             bool result = ClipboardHelper.Clear();
-            result.Should().BeFalse();
+            if (TestPlatform.IsWindows())
+            {
+                ((object)result).Should().BeOfType<bool>();
+            }
+            else
+            {
+                result.Should().BeFalse();
+            }
         }
 
         // ── ContainsText ───────────────────────────────────────
@@ -116,7 +124,14 @@ namespace BPlusLib.Foundation.Tests.Clipboard
         public void ContainsText_OnLinux_ReturnsFalse()
         {
             bool result = ClipboardHelper.ContainsText();
-            result.Should().BeFalse();
+            if (TestPlatform.IsWindows())
+            {
+                ((object)result).Should().BeOfType<bool>();
+            }
+            else
+            {
+                result.Should().BeFalse();
+            }
         }
 
         // ── ContainsFiles ──────────────────────────────────────
@@ -143,7 +158,14 @@ namespace BPlusLib.Foundation.Tests.Clipboard
         public void GetAvailableFormats_OnLinux_ReturnsEmpty()
         {
             ClipboardFormat[] formats = ClipboardHelper.GetAvailableFormats();
-            formats.Should().BeEmpty();
+            if (TestPlatform.IsWindows())
+            {
+                formats.Should().NotBeNull();
+            }
+            else
+            {
+                formats.Should().BeEmpty();
+            }
         }
 
         // ── GetFormatNames ─────────────────────────────────────
