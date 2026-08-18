@@ -208,6 +208,7 @@ namespace BPlusLib.Foundation.Graphics
         /// </summary>
         [Category("Appearance")]
         [Description("The color of the progress ring.")]
+        [DefaultValue(typeof(Color), "DodgerBlue")]
         public Color ProgressColor
         {
             get => _progressColor;
@@ -220,6 +221,7 @@ namespace BPlusLib.Foundation.Graphics
         /// </summary>
         [Category("Appearance")]
         [Description("Gradient end color for the progress ring. Empty = no gradient.")]
+        [DefaultValue(typeof(Color), "")]
         public Color ProgressColor2
         {
             get => _progressColor2;
@@ -231,6 +233,7 @@ namespace BPlusLib.Foundation.Graphics
         /// </summary>
         [Category("Appearance")]
         [Description("The color of the background track ring.")]
+        [DefaultValue(typeof(Color), "LightGray")]
         public Color TrackColor
         {
             get => _trackColor;
@@ -242,6 +245,7 @@ namespace BPlusLib.Foundation.Graphics
         /// </summary>
         [Category("Appearance")]
         [Description("The color of the percentage text.")]
+        [DefaultValue(typeof(Color), "Black")]
         public Color TextColor
         {
             get => _textColor;
@@ -253,6 +257,7 @@ namespace BPlusLib.Foundation.Graphics
         /// </summary>
         [Category("Appearance")]
         [Description("The color of the custom center text.")]
+        [DefaultValue(typeof(Color), "Black")]
         public Color CenterTextColor
         {
             get => _centerTextColor;
@@ -288,11 +293,48 @@ namespace BPlusLib.Foundation.Graphics
         /// </summary>
         [Category("Appearance")]
         [Description("The font for center text. If null, uses control Font scaled to 18% of size.")]
+        [AmbientValue(null)]
         public Font? TextFont
         {
             get => _textFont;
             set { _textFont = value; Invalidate(); }
         }
+
+        /// <summary>Designer reset hook for <see cref="ProgressColor"/>.</summary>
+        public void ResetProgressColor() => ProgressColor = Color.DodgerBlue;
+
+        /// <summary>Designer serialization hook for <see cref="ProgressColor"/>.</summary>
+        public bool ShouldSerializeProgressColor() => ProgressColor != Color.DodgerBlue;
+
+        /// <summary>Designer reset hook for <see cref="ProgressColor2"/>.</summary>
+        public void ResetProgressColor2() => ProgressColor2 = Color.Empty;
+
+        /// <summary>Designer serialization hook for <see cref="ProgressColor2"/>.</summary>
+        public bool ShouldSerializeProgressColor2() => ProgressColor2 != Color.Empty;
+
+        /// <summary>Designer reset hook for <see cref="TrackColor"/>.</summary>
+        public void ResetTrackColor() => TrackColor = Color.LightGray;
+
+        /// <summary>Designer serialization hook for <see cref="TrackColor"/>.</summary>
+        public bool ShouldSerializeTrackColor() => TrackColor != Color.LightGray;
+
+        /// <summary>Designer reset hook for <see cref="TextColor"/>.</summary>
+        public void ResetTextColor() => TextColor = Color.Black;
+
+        /// <summary>Designer serialization hook for <see cref="TextColor"/>.</summary>
+        public bool ShouldSerializeTextColor() => TextColor != Color.Black;
+
+        /// <summary>Designer reset hook for <see cref="CenterTextColor"/>.</summary>
+        public void ResetCenterTextColor() => CenterTextColor = Color.Black;
+
+        /// <summary>Designer serialization hook for <see cref="CenterTextColor"/>.</summary>
+        public bool ShouldSerializeCenterTextColor() => CenterTextColor != Color.Black;
+
+        /// <summary>Designer reset hook for <see cref="TextFont"/>.</summary>
+        public void ResetTextFont() => TextFont = null;
+
+        /// <summary>Designer serialization hook for <see cref="TextFont"/>.</summary>
+        public bool ShouldSerializeTextFont() => TextFont is not null;
 
         /// <summary>
         /// Gets or sets whether animation is enabled.

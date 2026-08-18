@@ -1,24 +1,17 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>net472;net8.0-windows</TargetFrameworks>
+    <TargetFrameworks>net8.0-windows;net10.0-windows</TargetFrameworks>
     <LangVersion>12</LangVersion>
     <Nullable>enable</Nullable>
     <IsPackable>false</IsPackable>
     <RootNamespace>BPlusLib.Foundation.Tests</RootNamespace>
     <AssemblyName>BPlusLib.Foundation.Tests</AssemblyName>
-  </PropertyGroup>
-
-  <!-- Windows-only: WinForms support for the Window module -->
-  <PropertyGroup Condition="$([MSBuild]::IsOSPlatform('Windows'))">
     <UseWindowsForms>true</UseWindowsForms>
+    <SupportedOSPlatform>Windows</SupportedOSPlatform>
+    <SupportedOSPlatformVersion>7.0</SupportedOSPlatformVersion>
     <DefineConstants>$(DefineConstants);FEATURE_WINDOW_MODULE</DefineConstants>
   </PropertyGroup>
-
-  <!-- VirtualSerial: net6.0+ only -->
-  <ItemGroup Condition="'$(TargetFramework)' == 'net472'">
-    <Compile Remove="VirtualSerial\**" />
-  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.10.0" />

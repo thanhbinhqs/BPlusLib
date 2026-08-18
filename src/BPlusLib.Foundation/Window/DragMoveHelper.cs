@@ -39,6 +39,41 @@ namespace BPlusLib.Foundation.Window
         }
 
         /// <summary>
+        /// Begins a native drag-move operation for an existing window handle.
+        /// This is convenient for WPF (<c>WindowInteropHelper(window).Handle</c>)
+        /// and any custom HWND-backed host.
+        /// </summary>
+        /// <param name="hwnd">Window handle.</param>
+        /// <returns><c>true</c> if the drag message was sent; otherwise <c>false</c>.</returns>
+        public static bool BeginDrag(IntPtr hwnd)
+        {
+            if (hwnd == IntPtr.Zero)
+                return false;
+
+            try
+            {
+                _ = User32.ReleaseCapture();
+                _ = User32.SendMessage(hwnd, (uint)User32.WM_NCLBUTTONDOWN, (IntPtr)User32.HTCAPTION, IntPtr.Zero);
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Begins a native drag-move operation for a WinForms window-like object.
+        /// </summary>
+        /// <param name="window">Window exposing a native handle.</param>
+        /// <returns><c>true</c> if the drag message was sent; otherwise <c>false</c>.</returns>
+        public static bool BeginDrag(IWin32Window window)
+        {
+            Guard.ThrowIfNull(window);
+            return BeginDrag(window.Handle);
+        }
+
+        /// <summary>
         /// Attaches drag-move behavior restricted to the specified control area.
         /// </summary>
         /// <param name="form">The form containing the drag area.</param>

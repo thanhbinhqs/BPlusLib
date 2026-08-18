@@ -1,6 +1,6 @@
 # Window
 
-WinForms window management utilities including window animations (flash, shake, fade), position persistence via registry, edge-based resizing for borderless forms, drag-move for custom title bars, and display monitor enumeration. Most Window module classes require the `FEATURE_WINDOW_MODULE` compile flag.
+Windows desktop window management utilities for .NET 8/10, focused on WinForms and HWND-based hosts such as WPF. Includes window animations (flash, shake, fade), position persistence via registry, edge-based resizing for borderless forms, drag-move for custom title bars, and display monitor enumeration.
 
 ## Classes
 
@@ -38,8 +38,10 @@ Enables form dragging by emulating title-bar drag behavior for custom/borderless
 
 | Method/Property | Returns | Description |
 |-----------------|---------|-------------|
+| BeginDrag(hwnd) | bool | Starts a native drag-move from any HWND (ideal for WPF) |
 | Attach(form) | void | Attaches drag-move to the entire form surface |
 | Attach(form, dragArea) | void | Attaches drag-move restricted to a specific control |
+| BeginDrag(window) | bool | Starts drag-move from a WinForms `IWin32Window` |
 | Detach(form) | void | Detaches drag-move behavior |
 
 ### MonitorHelper
@@ -101,6 +103,10 @@ posMgr.Restore(form, "MainWindow");
 DragMoveHelper.Attach(form); // Entire form draggable
 DragMoveHelper.Attach(form, titleBarPanel); // Only title bar
 ResizeHelper.EnableResize(form, borderWidth: 6);
+
+// WPF / any HWND host
+// using System.Windows.Interop;
+// DragMoveHelper.BeginDrag(new WindowInteropHelper(this).Handle);
 
 // Monitor info
 var monitors = MonitorHelper.GetAllMonitors();

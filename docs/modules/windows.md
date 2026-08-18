@@ -235,6 +235,11 @@ TaskbarProgressHelper.SetProgress(form, 75); // 75%
 TaskbarProgressHelper.SetState(form, TaskbarProgressState.Normal);
 TaskbarProgressHelper.ClearProgress(form);
 
+// Taskbar progress from WPF
+// using System.Windows.Interop;
+// var hwnd = new WindowInteropHelper(this).Handle;
+// TaskbarProgressHelper.SetProgress(hwnd, 75, 100);
+
 // Network monitoring
 using var monitor = new NetworkMonitor();
 monitor.StatusChanged += (s, e) =>

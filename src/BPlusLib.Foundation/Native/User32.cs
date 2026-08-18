@@ -70,6 +70,9 @@ namespace BPlusLib.Foundation.Native
         /// <summary>WM_CLOSE — Sent as a signal that a window or application should terminate.</summary>
         internal const int WM_CLOSE = 0x0010;
 
+        /// <summary>WM_NCLBUTTONDOWN — posted when the user presses the left mouse button in the non-client area.</summary>
+        internal const int WM_NCLBUTTONDOWN = 0x00A1;
+
         // =====================================================================
         // Hit-test values
         // =====================================================================
@@ -234,6 +237,11 @@ namespace BPlusLib.Foundation.Native
         [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Auto)]
         internal static extern IntPtr SendMessage(
             IntPtr hWnd, uint Msg, IntPtr wParam, IntPtr lParam);
+
+        /// <summary>Releases the mouse capture from a window in the current thread.</summary>
+        [DllImport("user32.dll", SetLastError = true)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        internal static extern bool ReleaseCapture();
 
         /// <summary>Sends a message with string parameter.</summary>
         [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]

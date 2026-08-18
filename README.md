@@ -1,17 +1,17 @@
 # BPlusLib.Foundation
 
-**Enterprise-grade Windows Foundation Library — 32 modules, 1,309 tests, pure P/Invoke.**
+**Enterprise-grade Windows-only foundation library for .NET 8/10 desktop apps — WinForms, WPF, 32 modules, pure P/Invoke.**
 
 ---
 
 ## Overview
 
-BPlusLib.Foundation is a production-ready C# utility library for Windows desktop development. All components use pure P/Invoke — **no WMI, no PowerShell, no external executables**. Cross-platform graceful degradation: every method returns `null`/`false` instead of throwing on non-Windows.
+BPlusLib.Foundation is a production-ready C# utility library for Windows desktop development on **.NET 8 and .NET 10**. It is now intentionally **Windows-only** so desktop APIs light up predictably in WinForms and WPF. All components use pure P/Invoke — **no WMI, no PowerShell, no external executables**.
 
 | | |
 |---|---|
-| **Targets** | net472 · net6.0 · net8.0 |
-**Version** | 2.12.1
+| **Targets** | net8.0-windows · net10.0-windows |
+**Version** | 2.12.2
 | **License** | MIT |
 | **Tests** | 1,309 (1,217 passing, 92 skipped — Windows-only) |
 | **Author** | [thanhbinhqs](https://github.com/thanhbinhqs) |
@@ -21,7 +21,7 @@ BPlusLib.Foundation is a production-ready C# utility library for Windows desktop
 ## Quick Start
 
 ```bash
-dotnet add package BPlusLib.Foundation --source "https://nuget.pkg.github.com/thanhbinhqs/index.json"
+dotnet add package BPlusLib.Foundation
 ```
 
 ```csharp
@@ -63,6 +63,13 @@ pipeServer.Write(Encoding.UTF8.GetBytes("response"));
 // Auto-update
 using BPlusLib.Foundation.Windows;
 await AppUpdater.UpdateAsync("https://example.com/releases/latest.zip");
+
+// Borderless drag-move (WinForms)
+using BPlusLib.Foundation.Window;
+DragMoveHelper.Attach(this, titleBarPanel);
+
+// Borderless drag-move (WPF)
+// DragMoveHelper.BeginDrag(new WindowInteropHelper(this).Handle);
 
 // Cisco EWC (RESTCONF + Syslog)
 using BPlusLib.Foundation.Networking.Cisco;
@@ -309,16 +316,16 @@ dotnet test --framework net8.0
 dotnet pack -c Release
 ```
 
-## NuGet (GitHub Packages)
+## NuGet
 
 ```
-Source: https://nuget.pkg.github.com/thanhbinhqs/index.json
+Source: https://api.nuget.org/v3/index.json
 Package: BPlusLib.Foundation
-Version: 2.12.1
+Version: 2.12.2
 ```
 
 ```bash
-dotnet add package BPlusLib.Foundation --version 2.12.1 --source "https://nuget.pkg.github.com/thanhbinhqs/index.json"
+dotnet add package BPlusLib.Foundation --version 2.12.2
 ```
 
 ## License
